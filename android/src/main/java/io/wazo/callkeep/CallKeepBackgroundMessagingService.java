@@ -28,7 +28,7 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 
 public class CallKeepBackgroundMessagingService extends Service {
-  private static final String TAG = "FLT:CallKeepService";
+  private static final String TAG = "[Flutter] FLT:CallKeepService";
   private static @Nullable PowerManager.WakeLock sWakeLock;
   /**
    * Acquire a wake lock to ensure the device doesn't go to sleep while processing background tasks.

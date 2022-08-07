@@ -42,7 +42,7 @@ public class VoiceConnection extends Connection {
     private boolean isMuted = false;
     private HashMap<String, String> handle;
     private Context context;
-    private static final String TAG = "RNCK:VoiceConnection";
+    private static final String TAG = "[Flutter] RNCK:VoiceConnection";
 
     VoiceConnection(Context context, HashMap<String, String> handle) {
         super();
@@ -91,7 +91,7 @@ public class VoiceConnection extends Connection {
         super.onAnswer(videoState);
         Log.d(TAG, "onAnswer videoState called: " + videoState);
 
-        setConnectionCapabilities(getConnectionCapabilities() | Connection.CAPABILITY_HOLD);
+//        setConnectionCapabilities(getConnectionCapabilities() | Connection.CAPABILITY_HOLD);
         setAudioModeIsVoip(true);
 
         sendCallRequestToActivity(ACTION_ANSWER_CALL, handle);

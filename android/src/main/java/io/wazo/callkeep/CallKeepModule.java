@@ -76,7 +76,7 @@ public class CallKeepModule {
     private static final String[] permissions = { Manifest.permission.READ_PHONE_STATE,
             Manifest.permission.CALL_PHONE, Manifest.permission.RECORD_AUDIO , Manifest.permission.READ_PHONE_NUMBERS };
 
-    private static final String TAG = "FLT:CallKeepModule";
+    private static final String TAG = "[Flutter] FLT:CallKeepModule";
     private static TelecomManager telecomManager;
     private static TelephonyManager telephonyManager;
     private Context _context;
@@ -517,7 +517,7 @@ public class CallKeepModule {
             return;
         }
 
-        conn.setConnectionCapabilities(conn.getConnectionCapabilities() | Connection.CAPABILITY_HOLD);
+//        conn.setConnectionCapabilities(conn.getConnectionCapabilities() | Connection.CAPABILITY_HOLD);
         conn.setActive();
     }
 

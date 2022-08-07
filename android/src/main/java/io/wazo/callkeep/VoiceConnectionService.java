@@ -26,11 +26,13 @@ import android.app.NotificationManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.telecom.Connection;
 import android.telecom.ConnectionRequest;
 import android.telecom.ConnectionService;
@@ -53,6 +55,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import io.flutter.embedding.engine.FlutterEngine;
+import io.flutter.embedding.engine.dart.DartExecutor;
+import io.flutter.embedding.engine.loader.FlutterLoader;
+import io.flutter.view.FlutterCallbackInformation;
 import io.wazo.callkeep.utils.ConstraintsMap;
 import static io.wazo.callkeep.Constants.*;
 import static io.wazo.callkeep.Constants.FOREGROUND_SERVICE_TYPE_MICROPHONE;
@@ -66,7 +72,7 @@ public class VoiceConnectionService extends ConnectionService {
     private static String notReachableCallUuid;
     private static ConnectionRequest currentConnectionRequest;
     private static PhoneAccountHandle phoneAccountHandle = null;
-    private static String TAG = "RNCK:VoiceConnectionService";
+    private static String TAG = "[Flutter] RNCK:VoiceConnectionService";
     public static Map<String, VoiceConnection> currentConnections = new HashMap<>();
     public static Boolean hasOutgoingCall = false;
     public static VoiceConnectionService currentConnectionService = null;
@@ -125,6 +131,8 @@ public class VoiceConnectionService extends ConnectionService {
 
     @Override
     public Connection onCreateIncomingConnection(PhoneAccountHandle connectionManagerPhoneAccount, ConnectionRequest request) {
+        Log.d(TAG, "onCreateIncomingConnection ::: ");
+
         Bundle extra = request.getExtras();
         Uri number = request.getAddress();
         String name = extra.getString(EXTRA_CALLER_NAME);
@@ -139,6 +147,7 @@ public class VoiceConnectionService extends ConnectionService {
 
     @Override
     public Connection onCreateOutgoingConnection(PhoneAccountHandle connectionManagerPhoneAccount, ConnectionRequest request) {
+        Log.d(TAG, "onCreateOutgoingConnection ::: ");
         VoiceConnectionService.hasOutgoingCall = true;
         String uuid = UUID.randomUUID().toString();
 
@@ -165,6 +174,40 @@ public class VoiceConnectionService extends ConnectionService {
         if (!isForeground || forceWakeUp) {
             Log.d(TAG, "onCreateOutgoingConnection: Waking up application");
             this.wakeUpApplication(uuid, number, displayName);
+
+//             FlutterLoader loader = new FlutterLoader();
+//             Handler mainHandler = new Handler(Looper.getMainLooper());
+//             Runnable myRunnable =
+//                     () -> {
+//                         loader.startInitialization(this.getApplicationContext());
+//                         loader.ensureInitializationCompleteAsync(
+//                                 this.getApplicationContext(),
+//                                 null,
+//                                 mainHandler,
+//                                 () -> {
+//                                     String appBundlePath = loader.findAppBundlePath();
+//                                     AssetManager assets = this.getApplicationContext().getAssets();
+
+//                                     Log.i(TAG, "Creating background FlutterEngine instance.");
+//                                     FlutterEngine backgroundFlutterEngine =
+//                                                     new FlutterEngine(getApplicationContext());
+
+//                                     // We need to create an instance of `FlutterEngine` before looking up the
+//                                     // callback. If we don't, the callback cache won't be initialized and the
+//                                     // lookup will fail.
+// //                                    FlutterCallbackInformation flutterCallback =
+// //                                            FlutterCallbackInformation.lookupCallbackInformation(callbackHandle);
+//                                     DartExecutor executor = backgroundFlutterEngine.getDartExecutor();
+// //                                    initializeMethodChannel(executor);
+//                                     DartExecutor.DartCallback dartCallback =
+//                                             new DartExecutor.DartCallback(assets, appBundlePath, null);
+
+//                                     executor.executeDartCallback(dartCallback);
+
+//                                 });
+//                     };
+//             mainHandler.post(myRunnable);
+
         } else if (!this.canMakeOutgoingCall() && isReachable) {
             Log.d(TAG, "onCreateOutgoingConnection: not available");
             return Connection.createFailedConnection(new DisconnectCause(DisconnectCause.LOCAL));
@@ -310,7 +353,7 @@ public class VoiceConnectionService extends ConnectionService {
         HashMap<String, String> extrasMap = this.bundleToMap(extras);
         extrasMap.put(EXTRA_CALL_NUMBER, request.getAddress().toString());
         VoiceConnection connection = new VoiceConnection(this, extrasMap);
-        connection.setConnectionCapabilities(Connection.CAPABILITY_MUTE | Connection.CAPABILITY_SUPPORT_HOLD);
+//        connection.setConnectionCapabilities(Connection.CAPABILITY_MUTE | Connection.CAPABILITY_SUPPORT_HOLD);
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Context context = getApplicationContext();
