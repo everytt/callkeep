@@ -283,6 +283,35 @@ class _MyAppState extends State<HomePage> {
         handleType: 'number', hasVideo: false);
   }
 
+
+  Future<void> displayOutgoingCall(String number) async {
+    final String callUUID = newUUID();
+    setState(() {
+      calls[callUUID] = Call(number);
+    });
+    print('Display outgoing call now');
+    final bool hasPhoneAccount = await _callKeep.hasPhoneAccount();
+    if (!hasPhoneAccount) {
+      await _callKeep.hasDefaultPhoneAccount(context, <String, dynamic>{
+        'alertTitle': 'Permissions required',
+        'alertDescription':
+        'This application needs to access your phone accounts',
+        'cancelButton': 'Cancel',
+        'okButton': 'ok',
+        'foregroundService': {
+          'channelId': 'com.company.my',
+          'channelName': 'Foreground service for my app',
+          'notificationTitle': 'My app is running on background',
+          'notificationIcon': 'Path to the resource icon of the notification',
+        },
+      });
+    }
+
+    print('[displayOutgoingCall] $callUUID number: $number');
+    _callKeep.startCall(callUUID, number,"");
+  }
+
+
   void didDisplayIncomingCall(CallKeepDidDisplayIncomingCall event) {
     var callUUID = event.callUUID;
     var number = event.handle;
@@ -429,6 +458,12 @@ class _MyAppState extends State<HomePage> {
                   displayIncomingCallDelayed('10086');
                 },
                 child: const Text('Display incoming call now in 3s'),
+              ),
+              RaisedButton(
+                onPressed: () async {
+                  displayOutgoingCall('10086');
+                },
+                child: const Text('Display outgoing call now'),
               ),
               buildCallingWidgets()
             ],
