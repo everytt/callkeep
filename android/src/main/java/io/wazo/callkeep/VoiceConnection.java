@@ -18,8 +18,16 @@
 package io.wazo.callkeep;
 
 import android.annotation.TargetApi;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.media.AudioAttributes;
+import android.media.AudioManager;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -31,23 +39,31 @@ import android.telecom.TelecomManager;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import java.util.HashMap;
 
 import static io.wazo.callkeep.Constants.*;
 
+import io.wazo.callkeep.activity.IncomingCallActivity;
+import io.wazo.callkeep.activity.OutgoingCallActivity;
+
 @TargetApi(Build.VERSION_CODES.M)
 public class VoiceConnection extends Connection {
     private boolean isMuted = false;
     private HashMap<String, String> handle;
     private Context context;
+    private final boolean mIsIncomingCall;
     private static final String TAG = "[Flutter] RNCK:VoiceConnection";
 
-    VoiceConnection(Context context, HashMap<String, String> handle) {
+    VoiceConnection(Context context, HashMap<String, String> handle, boolean isIncomingCall) {
         super();
         this.handle = handle;
         this.context = context;
+        mIsIncomingCall = isIncomingCall;
 
         String number = handle.get(EXTRA_CALL_NUMBER);
         String name = handle.get(EXTRA_CALLER_NAME);
@@ -59,6 +75,76 @@ public class VoiceConnection extends Connection {
             setCallerDisplayName(name, TelecomManager.PRESENTATION_ALLOWED);
         }
     }
+
+    @Override
+    public void onShowIncomingCallUi() {
+//        super.onShowIncomingCallUi();
+        Log.i(TAG, "onShowIncomingCallUi ++");
+        createNotificationChanel();
+        Intent intent = new Intent(Intent.ACTION_MAIN, null);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NO_USER_ACTION | Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setClass(context, IncomingCallActivity.class);
+        PendingIntent pi = PendingIntent.getActivity(context, 1, intent, 0);
+
+        Notification.Builder builder = new Notification.Builder(context);
+        builder.setOngoing(true);
+        builder.setDefaults(NotificationCompat.DEFAULT_VIBRATE);
+        builder.setSound(null);
+        builder.setVisibility(Notification.VISIBILITY_PUBLIC);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) builder.setChannelId("callkit_incoming_channel_id");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder.setCategory(NotificationCompat.CATEGORY_CALL);
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            builder.setPriority(Notification.PRIORITY_HIGH);
+        }
+
+        builder.setContentIntent(pi);
+        builder.setFullScreenIntent(pi, true);
+        builder.setSmallIcon(R.drawable.ic_ttgo_big);
+
+        builder.setContentTitle("Your notification title");
+        builder.setContentText("Your notification content.");
+
+        String number = handle.get(EXTRA_CALL_NUMBER);
+        String name = handle.get(EXTRA_CALLER_NAME);
+        builder.setContentTitle(name);
+        builder.setContentText(number);
+
+        Notification notification = builder.build();
+        notification.flags |= Notification.FLAG_INSISTENT;
+
+        NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
+        notificationManager.notify("Call Notification", 37, notification);
+    }
+
+    private void createNotificationChanel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channelCall = new NotificationChannel(
+                    "callkit_incoming_channel_id",
+                    "Incoming Call",
+                    NotificationManager.IMPORTANCE_MAX
+            );
+
+            channelCall.setDescription("");
+            channelCall.setLightColor(Color.RED);
+            channelCall.enableLights(true);
+            channelCall.enableVibration(true);
+
+            Uri ringtoneUri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_RINGTONE);
+            channelCall.setSound(ringtoneUri, new AudioAttributes.Builder()
+                    // Setting the AudioAttributes is important as it identifies the purpose of your
+                    // notification sound.
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .setLegacyStreamType(AudioManager.STREAM_RING)
+                    .build());
+            NotificationManager mgr = context.getSystemService(NotificationManager.class);
+            mgr.createNotificationChannel(channelCall);
+        }
+    }
+
 
     @Override
     public void onExtrasChanged(Bundle extras) {

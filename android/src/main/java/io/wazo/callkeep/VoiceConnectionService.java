@@ -23,11 +23,14 @@ import android.app.ActivityManager.RunningTaskInfo;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
+import android.media.AudioAttributes;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -59,6 +62,7 @@ import io.flutter.embedding.engine.FlutterEngine;
 import io.flutter.embedding.engine.dart.DartExecutor;
 import io.flutter.embedding.engine.loader.FlutterLoader;
 import io.flutter.view.FlutterCallbackInformation;
+import io.wazo.callkeep.activity.IncomingCallActivity;
 import io.wazo.callkeep.utils.ConstraintsMap;
 import static io.wazo.callkeep.Constants.*;
 import static io.wazo.callkeep.Constants.FOREGROUND_SERVICE_TYPE_MICROPHONE;
@@ -136,11 +140,12 @@ public class VoiceConnectionService extends ConnectionService {
         Bundle extra = request.getExtras();
         Uri number = request.getAddress();
         String name = extra.getString(EXTRA_CALLER_NAME);
-        Connection incomingCallConnection = createConnection(request);
+        Connection incomingCallConnection = createConnection(request, true);
         incomingCallConnection.setRinging();
         incomingCallConnection.setInitialized();
 
-        startForegroundService();
+
+//        startForegroundService();
 
         return incomingCallConnection;
     }
@@ -174,40 +179,6 @@ public class VoiceConnectionService extends ConnectionService {
         if (!isForeground || forceWakeUp) {
             Log.d(TAG, "onCreateOutgoingConnection: Waking up application");
             this.wakeUpApplication(uuid, number, displayName);
-
-//             FlutterLoader loader = new FlutterLoader();
-//             Handler mainHandler = new Handler(Looper.getMainLooper());
-//             Runnable myRunnable =
-//                     () -> {
-//                         loader.startInitialization(this.getApplicationContext());
-//                         loader.ensureInitializationCompleteAsync(
-//                                 this.getApplicationContext(),
-//                                 null,
-//                                 mainHandler,
-//                                 () -> {
-//                                     String appBundlePath = loader.findAppBundlePath();
-//                                     AssetManager assets = this.getApplicationContext().getAssets();
-
-//                                     Log.i(TAG, "Creating background FlutterEngine instance.");
-//                                     FlutterEngine backgroundFlutterEngine =
-//                                                     new FlutterEngine(getApplicationContext());
-
-//                                     // We need to create an instance of `FlutterEngine` before looking up the
-//                                     // callback. If we don't, the callback cache won't be initialized and the
-//                                     // lookup will fail.
-// //                                    FlutterCallbackInformation flutterCallback =
-// //                                            FlutterCallbackInformation.lookupCallbackInformation(callbackHandle);
-//                                     DartExecutor executor = backgroundFlutterEngine.getDartExecutor();
-// //                                    initializeMethodChannel(executor);
-//                                     DartExecutor.DartCallback dartCallback =
-//                                             new DartExecutor.DartCallback(assets, appBundlePath, null);
-
-//                                     executor.executeDartCallback(dartCallback);
-
-//                                 });
-//                     };
-//             mainHandler.post(myRunnable);
-
         } else if (!this.canMakeOutgoingCall() && isReachable) {
             Log.d(TAG, "onCreateOutgoingConnection: not available");
             return Connection.createFailedConnection(new DisconnectCause(DisconnectCause.LOCAL));
@@ -220,12 +191,12 @@ public class VoiceConnectionService extends ConnectionService {
             extras.putString(EXTRA_CALL_NUMBER, number);
         }
 
-        outgoingCallConnection = createConnection(request);
+        outgoingCallConnection = createConnection(request, false);
         outgoingCallConnection.setDialing();
         outgoingCallConnection.setAudioModeIsVoip(true);
         outgoingCallConnection.setCallerDisplayName(displayName, TelecomManager.PRESENTATION_ALLOWED);
 
-        startForegroundService();
+//        startForegroundService();
 
         // ‍️Weirdly on some Samsung phones (A50, S9...) using `setInitialized` will not display the native UI ...
         // when making a call from the native Phone application. The call will still be displayed correctly without it.
@@ -348,11 +319,11 @@ public class VoiceConnectionService extends ConnectionService {
         return isAvailable;
     }
 
-    private Connection createConnection(ConnectionRequest request) {
+    private Connection createConnection(ConnectionRequest request, boolean isIncomingCall) {
         Bundle extras = request.getExtras();
         HashMap<String, String> extrasMap = this.bundleToMap(extras);
         extrasMap.put(EXTRA_CALL_NUMBER, request.getAddress().toString());
-        VoiceConnection connection = new VoiceConnection(this, extrasMap);
+        VoiceConnection connection = new VoiceConnection(this, extrasMap, isIncomingCall);
 //        connection.setConnectionCapabilities(Connection.CAPABILITY_MUTE | Connection.CAPABILITY_SUPPORT_HOLD);
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
