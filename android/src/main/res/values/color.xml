@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="base_bg">#ffffff</color>
+    <color name="white">#ffffff</color>
+    <color name="point">#fff14f</color>
+    <color name="highlight">#fa6400</color>
+
+
+</resources>
