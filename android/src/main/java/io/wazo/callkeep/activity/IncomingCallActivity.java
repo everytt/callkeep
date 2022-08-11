@@ -30,18 +30,13 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import java.net.DatagramSocket;
-import java.net.SocketException;
 import java.util.Calendar;
 
 import io.wazo.callkeep.R;
 import io.wazo.callkeep.activity.listener.DebouncedOnClickListener;
 
-public class IncomingCallActivity extends AppCompatActivity implements SensorEventListener {
+public class IncomingCallActivity extends Activity {
     public static final String EXTRA_KEY_FRIEND_NAME = "IncomingCallActivity.extra_key_friend_name";
     public static final String EXTRA_KEY_FRIEND_ID = "IncomingCallActivity.extra_key_friend_id";
     public static final String EXTRA_KEY_RECEIVED_MSG = "extra_key_received_msg";
@@ -61,10 +56,8 @@ public class IncomingCallActivity extends AppCompatActivity implements SensorEve
     private View mContainerCallingBtn;
     private View mContainerWaitingBtn;
 
-    private SensorManager mSensorManager;
     private PowerManager.WakeLock mProximityWakeLock;
-    private float old_sensor = 0;
-    private KeyguardManager.KeyguardLock mKeyguardLock;
+
 
     private long mStartTime;
     private Handler mHandler = new Handler();
@@ -86,13 +79,6 @@ public class IncomingCallActivity extends AppCompatActivity implements SensorEve
             mHandler.postDelayed(mTimerRunnable, 1000L);
         }
     };
-
-    private DatagramSocket mUdpSocket;
-
-    @Override
-    protected void attachBaseContext(Context base) {
-//        super.attachBaseContext(LocaleHelper.onAttach(base));
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,19 +104,13 @@ public class IncomingCallActivity extends AppCompatActivity implements SensorEve
         if (mProximityWakeLock != null) {
             mProximityWakeLock.acquire();
         }
-
-        KeyguardManager keyguardManager = (KeyguardManager) getSystemService(Activity.KEYGUARD_SERVICE);
-        mKeyguardLock = keyguardManager.newKeyguardLock(KEYGUARD_SERVICE);
-//        mKeyguardLock.disableKeyguard();
-
         mTextTimer = (TextView) findViewById(R.id.text_timer);
 
-        String name = getIntent().getStringExtra(EXTRA_KEY_FRIEND_NAME);
-        TextView textName = (TextView) findViewById(R.id.text_name);
-        textName.setText(name);
 
+        TextView textName = (TextView) findViewById(R.id.text_name);
+//        textName.setText(name);
         TextView textNumber = (TextView) findViewById(R.id.text_phone_number);
-//        textNumber.setText(mPhoneNumber);
+//        textNumber.setText(handle);
 
         TextView textReceiverName = findViewById(R.id.text_receiver_from_server);
 //        textReceiverName.setText(mReceiverName);
@@ -149,7 +129,6 @@ public class IncomingCallActivity extends AppCompatActivity implements SensorEve
         initListener();
 
         initAudioManager();
-        initProximitySensor();
     }
 
     private void initWindowFlag() {
@@ -184,14 +163,6 @@ public class IncomingCallActivity extends AppCompatActivity implements SensorEve
         }
     }
 
-    private void initProximitySensor() {
-        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        Sensor sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
-        if (sensor != null) {
-            mSensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI);
-        }
-    }
-
     private void initAudioManager() {
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
@@ -213,7 +184,6 @@ public class IncomingCallActivity extends AppCompatActivity implements SensorEve
         mBtnSpeak.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                mState = String.valueOf(Call.STATE_INCOMING);
                 changeToSpeakMode();
             }
         });
@@ -221,37 +191,30 @@ public class IncomingCallActivity extends AppCompatActivity implements SensorEve
         mBtnAnswer.setOnPanelListener(new PanelLeft.OnPanelListener() {
             @Override
             public void onPanelEnd() {
-//                mState = String.valueOf(Call.STATE_INCOMING);
-
-//                ringOff();
                 switchCallingView(true);
+
+
             }
         });
 
         mBtnIgnore.setOnPanelListener(new PanelRight.OnPanelListener() {
             @Override
             public void onPanelEnd() {
-//                ringOff();
-//                mState = String.valueOf(Call.STATE_INCOMING);
-//                endCall();
             }
         });
 
         mBtnEnd.setOnClickListener(new DebouncedOnClickListener() {
             @Override
             public void onDebouncedClick(View view) {
-//                mState = String.valueOf(Call.STATE_INCOMING);
             }
         });
 
         mBtnBluetooth.setOnClickListener(new DebouncedOnClickListener() {
             @Override
             public void onDebouncedClick(View v) {
-//                mState = String.valueOf(Call.STATE_INCOMING);
                 if (isBluetoothAvailable()) {
                     changeToBlueTooth();
                 } else {
-//                    Toast.makeText(getApplicationContext(), R.string.msg_there_is_no_paired_bluetooth, Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -360,49 +323,5 @@ public class IncomingCallActivity extends AppCompatActivity implements SensorEve
         Log.i(getClass().getSimpleName(), "moveTaskToBack!");
 
         moveTaskToBack(true);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-
-        super.onPause();
-    }
-
-    @Override
-    protected void onDestroy() {
-//        mKeyguardLock.reenableKeyguard();    // 기본 잠금화면 나타내기
-        if (mProximityWakeLock != null) {
-            if (mProximityWakeLock.isHeld()) {
-                mProximityWakeLock.release();
-            }
-            mProximityWakeLock = null;
-        }
-        super.onDestroy();
-    }
-
-    @Override
-    public void onSensorChanged(SensorEvent sensorEvent) {
-        if (sensorEvent.sensor.getType() == Sensor.TYPE_PROXIMITY) {
-            Log.i(getClass().getSimpleName(), "sensorEvent.values[0]: " + sensorEvent.values[0]);
-            if (sensorEvent.values[0] <= old_sensor) {
-                if (mProximityWakeLock != null && !mProximityWakeLock.isHeld()) {
-                    mProximityWakeLock.acquire();
-                }
-            } else {
-                if (mProximityWakeLock != null && mProximityWakeLock.isHeld()) {
-                    mProximityWakeLock.release();
-                }
-            }
-            old_sensor = sensorEvent.values[0];
-        }
-    }
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int i) {
     }
 }
