@@ -21,6 +21,7 @@
             android:theme="@style/CallkitScreenTheme">
 
             <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
@@ -34,8 +35,19 @@
             android:exported="true"
             android:theme="@style/CallkitScreenTheme">
             <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
+        <receiver
+            android:name=".IncomingNotificationReceiver"
+            android:exported="true"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="io.wazo.callkeep.action.ANSWER_CALL"/>
+                <action android:name="io.wazo.callkeep.action.REJECT_CALL"/>
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>

@@ -23,19 +23,14 @@ import android.app.ActivityManager.RunningTaskInfo;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.AssetManager;
 import android.content.res.Resources;
-import android.media.AudioAttributes;
-import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.telecom.Connection;
 import android.telecom.ConnectionRequest;
 import android.telecom.ConnectionService;
@@ -58,11 +53,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import io.flutter.embedding.engine.FlutterEngine;
-import io.flutter.embedding.engine.dart.DartExecutor;
-import io.flutter.embedding.engine.loader.FlutterLoader;
-import io.flutter.view.FlutterCallbackInformation;
-import io.wazo.callkeep.activity.IncomingCallActivity;
 import io.wazo.callkeep.utils.ConstraintsMap;
 import static io.wazo.callkeep.Constants.*;
 import static io.wazo.callkeep.Constants.FOREGROUND_SERVICE_TYPE_MICROPHONE;
@@ -85,6 +75,15 @@ public class VoiceConnectionService extends ConnectionService {
     public static Connection getConnection(String connectionId) {
         if (currentConnections.containsKey(connectionId)) {
             return currentConnections.get(connectionId);
+        }
+        return null;
+    }
+
+    public static Connection getConnectionById(int callId) {
+        for(VoiceConnection connection : currentConnections.values()) {
+            if (connection.getCallId() == callId) {
+                return connection;
+            }
         }
         return null;
     }

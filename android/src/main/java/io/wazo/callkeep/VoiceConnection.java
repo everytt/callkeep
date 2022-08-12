@@ -25,6 +25,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.Icon;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.RingtoneManager;
@@ -53,16 +54,25 @@ import io.wazo.callkeep.activity.OutgoingCallActivity;
 
 @TargetApi(Build.VERSION_CODES.M)
 public class VoiceConnection extends Connection {
+    public static final String INCOMING_CALL_CHANNEL_ID = "INCOMING_CALL_CHANNEL_ID";
+    public static final String EXTRA_PHONE_ACCOUNT_HANDLE = "io.wazo.callkeep.extra.PHONE_ACCOUNT_HANDLE";
+    public static final String CALL_NOTIFICATION = "io.wazo.callkeep.INCOMING_CALL";
+
+    private static int sNextCallId = 1;
+
     private boolean isMuted = false;
     private HashMap<String, String> handle;
     private Context context;
     private final boolean mIsIncomingCall;
+    private final int mCallId;
     private static final String TAG = "[Flutter] RNCK:VoiceConnection";
+
 
     VoiceConnection(Context context, HashMap<String, String> handle, boolean isIncomingCall) {
         super();
         this.handle = handle;
         this.context = context;
+        mCallId = sNextCallId++;
         mIsIncomingCall = isIncomingCall;
 
         String number = handle.get(EXTRA_CALL_NUMBER);
@@ -76,6 +86,10 @@ public class VoiceConnection extends Connection {
         }
     }
 
+    public int getCallId() {
+        return mCallId;
+    }
+
     @Override
     public void onShowIncomingCallUi() {
 //        super.onShowIncomingCallUi();
@@ -84,6 +98,7 @@ public class VoiceConnection extends Connection {
         Intent intent = new Intent(Intent.ACTION_MAIN, null);
         intent.setFlags(Intent.FLAG_ACTIVITY_NO_USER_ACTION | Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.setClass(context, IncomingCallActivity.class);
+        intent.putExtra(Constants.EXTRA_CALL_ID, mCallId);
         PendingIntent pi = PendingIntent.getActivity(context, 1, intent, 0);
 
         Notification.Builder builder = new Notification.Builder(context);
@@ -107,16 +122,42 @@ public class VoiceConnection extends Connection {
         builder.setContentTitle("Your notification title");
         builder.setContentText("Your notification content.");
 
+        final Intent answerIntent = new Intent(
+                IncomingNotificationReceiver.ACTION_ANSWER_CALL, null, context,
+                IncomingNotificationReceiver.class);
+        answerIntent.putExtra(Constants.EXTRA_CALL_ID, mCallId);
+        final Intent rejectIntent = new Intent(
+                IncomingNotificationReceiver.ACTION_REJECT_CALL, null, context,
+                IncomingNotificationReceiver.class);
+        rejectIntent.putExtra(Constants.EXTRA_CALL_ID, mCallId);
+
+
         String number = handle.get(EXTRA_CALL_NUMBER);
         String name = handle.get(EXTRA_CALLER_NAME);
         builder.setContentTitle(name);
         builder.setContentText(number);
 
+
+        builder.addAction(
+                new Notification.Action.Builder(
+                        Icon.createWithResource(context, R.drawable.ic_ttgo_big),
+                        "Answer",
+                        PendingIntent.getBroadcast(context, 0, answerIntent,
+                                PendingIntent.FLAG_UPDATE_CURRENT))
+                        .build());
+        builder.addAction(
+                new Notification.Action.Builder(
+                        Icon.createWithResource(context, R.drawable.ic_ttgo_big),
+                        "Reject",
+                        PendingIntent.getBroadcast(context, 0, rejectIntent,
+                                PendingIntent.FLAG_UPDATE_CURRENT))
+                        .build());
+
         Notification notification = builder.build();
         notification.flags |= Notification.FLAG_INSISTENT;
 
         NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
-        notificationManager.notify("Call Notification", 37, notification);
+        notificationManager.notify(CALL_NOTIFICATION, mCallId, notification);
     }
 
     private void createNotificationChanel() {
@@ -153,6 +194,19 @@ public class VoiceConnection extends Connection {
         if (attributeMap != null) {
             handle = attributeMap;
         }
+    }
+
+    @Override
+    public void onStateChanged(int state) {
+        Log.d(TAG, "onStateChanged : " + state);
+
+        if(state == Connection.STATE_DIALING) {
+            Intent intent = new Intent(context, OutgoingCallActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+        }
+
+        super.onStateChanged(state);
     }
 
     @Override
@@ -199,6 +253,7 @@ public class VoiceConnection extends Connection {
     public void onDisconnect() {
         super.onDisconnect();
         setDisconnected(new DisconnectCause(DisconnectCause.LOCAL));
+
         sendCallRequestToActivity(ACTION_END_CALL, handle);
         Log.d(TAG, "onDisconnect executed");
         try {
@@ -207,6 +262,19 @@ public class VoiceConnection extends Connection {
             Log.e(TAG, "Handle map error", exception);
         }
         destroy();
+    }
+
+    public void setConnectionDisconnected(int cause) {
+        Log.d(TAG, "setConnectionDisconnected :: $cause");
+
+        NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
+        notificationManager.cancel(CALL_NOTIFICATION, mCallId);
+        setDisconnected(new DisconnectCause(cause));
+
+        sendCallRequestToActivity(ACTION_END_CALL, handle);
+        destroy();
+
+        // listener
     }
 
     public void reportDisconnect(int reason) {

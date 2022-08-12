@@ -2,21 +2,12 @@ package io.wazo.callkeep.activity;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.KeyguardManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.media.ToneGenerator;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -24,6 +15,7 @@ import android.os.PowerManager;
 import android.os.Vibrator;
 
 import android.telecom.Connection;
+import android.telecom.DisconnectCause;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -34,12 +26,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
-import java.net.DatagramSocket;
-import java.net.SocketException;
 import java.util.Calendar;
 
+import io.wazo.callkeep.Constants;
 import io.wazo.callkeep.R;
 import io.wazo.callkeep.VoiceConnection;
 import io.wazo.callkeep.VoiceConnectionService;
@@ -55,6 +44,7 @@ public class OutgoingCallActivity extends Activity {
 
     private AudioManager mAudioManager;
     private String mProductName = "";
+    private VoiceConnection mConnection;
 
     private TextView mTextName;
     private TextView mTextPhoneNumber;
@@ -112,9 +102,13 @@ public class OutgoingCallActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_outgoing_call);
+
+        Intent intent = getIntent();
+        int callId = intent.getIntExtra(Constants.EXTRA_CALL_ID, 0);
+        mConnection = (VoiceConnection) VoiceConnectionService.getConnectionById(callId);
+
         init();
 
-        Connection connection = VoiceConnectionService.getConnection("UUID");
 
     }
 
@@ -230,13 +224,18 @@ public class OutgoingCallActivity extends Activity {
         findViewById(R.id.btn_cancel_calling).setOnClickListener(new DebouncedOnClickListener() {
             @Override
             public void onDebouncedClick(View view) {
+                if(mConnection != null) {
+                    mConnection.setConnectionDisconnected(DisconnectCause.LOCAL);
+                }
             }
         });
 
         findViewById(R.id.btn_cancel_waiting).setOnClickListener(new DebouncedOnClickListener() {
             @Override
             public void onDebouncedClick(View view) {
-            }
+                if(mConnection != null) {
+                    mConnection.setConnectionDisconnected(DisconnectCause.LOCAL);
+                }            }
         });
 //
         mBtnBluetooth.setOnClickListener(new DebouncedOnClickListener() {

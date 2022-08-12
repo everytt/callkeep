@@ -2,28 +2,17 @@ package io.wazo.callkeep.activity;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.KeyguardManager;
+
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.media.ToneGenerator;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
-import android.os.Vibrator;
-import android.provider.Settings;
-import android.text.TextUtils;
+import android.telecom.DisconnectCause;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -33,22 +22,33 @@ import android.widget.TextView;
 
 import java.util.Calendar;
 
+import io.wazo.callkeep.Constants;
 import io.wazo.callkeep.R;
+import io.wazo.callkeep.VoiceConnection;
+import io.wazo.callkeep.VoiceConnectionService;
 import io.wazo.callkeep.activity.listener.DebouncedOnClickListener;
 
+import static io.wazo.callkeep.Constants.EXTRA_CALL_ID;
+
+
 public class IncomingCallActivity extends Activity {
+    public static final String TAG = "IncomingCallActivity";
+
     public static final String EXTRA_KEY_FRIEND_NAME = "IncomingCallActivity.extra_key_friend_name";
     public static final String EXTRA_KEY_FRIEND_ID = "IncomingCallActivity.extra_key_friend_id";
     public static final String EXTRA_KEY_RECEIVED_MSG = "extra_key_received_msg";
     public static final int CALL_NOTI_ID = 909;
     public static final int CALL_NOTI_ONGOING_ID = 90;
 
+    private VoiceConnection mConnection;
     private AudioManager mAudioManager;
 
     private TextView mTextTimer;
 
+    // incoming
     private PanelLeft mBtnAnswer;
     private PanelRight mBtnIgnore;
+
     private View mBtnEnd;
     private Button mBtnSpeak;
     private Button mBtnBluetooth;
@@ -98,6 +98,11 @@ public class IncomingCallActivity extends Activity {
 //            );
         }
 
+        Intent intent = getIntent();
+        int callId = intent.getIntExtra(Constants.EXTRA_CALL_ID, 0);
+        Log.i(TAG, "showing fullscreen answer ux for call id " + callId);
+
+        mConnection = (VoiceConnection) VoiceConnectionService.getConnectionById(callId);
 
         initWakeLock();
 
@@ -191,8 +196,8 @@ public class IncomingCallActivity extends Activity {
         mBtnAnswer.setOnPanelListener(new PanelLeft.OnPanelListener() {
             @Override
             public void onPanelEnd() {
-                switchCallingView(true);
-
+                if(mConnection != null) mConnection.onAnswer();
+//                switchCallingView(true);
 
             }
         });
@@ -200,6 +205,11 @@ public class IncomingCallActivity extends Activity {
         mBtnIgnore.setOnPanelListener(new PanelRight.OnPanelListener() {
             @Override
             public void onPanelEnd() {
+                if(mConnection != null) {
+                    mConnection.setConnectionDisconnected(DisconnectCause.REJECTED);
+                    mConnection.destroy();
+                }
+                finish();
             }
         });
 
