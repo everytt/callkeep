@@ -311,7 +311,7 @@ public class VoiceConnection extends Connection {
     public void onDisconnect() {
         super.onDisconnect();
         setDisconnected(new DisconnectCause(DisconnectCause.LOCAL));
-
+        if(mIsIncomingCall) cancelNotification();
         sendCallRequestToActivity(ACTION_END_CALL, handle);
         Log.d(TAG, "onDisconnect executed");
         try {
