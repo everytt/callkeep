@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -71,58 +72,10 @@
             android:textStyle="bold"
             android:visibility="gone" />
 
-        <TextView
-            android:id="@+id/text_waiting_big_msg"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@string/main_set_text11"
-            android:textColor="@color/white"
-            android:textSize="22sp" />
-
-        <TextView
-            android:id="@+id/text_waiting_message"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:gravity="center"
-            android:text="@string/tcp_text2"
-            android:textColor="@color/white"
-            android:textSize="17sp" />
-
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="50dp">
-
-            <LinearLayout
-                android:id="@+id/container_calling"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:visibility="gone">
-
-                <Button
-                    android:id="@+id/btn_speak"
-                    android:layout_width="84dp"
-                    android:layout_height="84dp"
-                    android:layout_margin="36dp"
-                    android:background="@drawable/call_btn_call_speaker_off" />
-
-                <Button
-                    android:id="@+id/btn_blue_tooth"
-                    android:layout_width="84dp"
-                    android:layout_height="84dp"
-                    android:background="@drawable/call_btn_bluetooth_off" />
-
-                <Button
-                    android:id="@+id/btn_cancel_calling"
-                    android:layout_width="84dp"
-                    android:layout_height="84dp"
-                    android:layout_margin="36dp"
-                    android:background="@drawable/call_btn_call_stop" />
-            </LinearLayout>
 
             <RelativeLayout
                 android:id="@+id/container_waiting"
@@ -142,7 +95,44 @@
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true" />
             </RelativeLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/container_calling"
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:orientation="horizontal"
+                    android:layout_gravity="bottom"
+                    android:visibility="gone">
+                    <Button
+                        android:id="@+id/btn_speak"
+                        android:layout_width="58dp"
+                        android:layout_height="58dp"
+                        android:background="@drawable/btn_call_speaker"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toLeftOf="@id/btn_cancel_calling"/>
+                    <Button
+                        android:id="@+id/btn_cancel_calling"
+                        android:layout_width="68dp"
+                        android:layout_height="68dp"
+                        android:background="@drawable/btn_call_cancel"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintLeft_toRightOf="@id/btn_speak"
+                        app:layout_constraintRight_toLeftOf="@id/btn_blue_tooth"/>
+                    <Button
+                        android:id="@+id/btn_blue_tooth"
+                        android:layout_width="58dp"
+                        android:layout_height="58dp"
+                        android:background="@drawable/btn_call_bluetooth"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintLeft_toRightOf="@id/btn_cancel_calling"
+                        app:layout_constraintRight_toRightOf="parent"/>
+                </androidx.constraintlayout.widget.ConstraintLayout>
         </FrameLayout>
+
     </LinearLayout>
 
     <View

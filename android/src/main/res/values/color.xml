@@ -5,5 +5,10 @@
     <color name="point">#fff14f</color>
     <color name="highlight">#fa6400</color>
 
+    <color name="accept">#4CAF50</color>
+    <color name="accept_ripple">#A6FFA9</color>
+    <color name="decline">#F44336</color>
+    <color name="decline_ripple">#FB8D85</color>
+    <color name="action_color">#4CAF50</color>
 
 </resources>

@@ -69,6 +69,7 @@ public class VoiceConnectionService extends ConnectionService {
     private static String TAG = "[Flutter] RNCK:VoiceConnectionService";
     public static Map<String, VoiceConnection> currentConnections = new HashMap<>();
     public static Boolean hasOutgoingCall = false;
+    public static Boolean isCalling = false;
     public static VoiceConnectionService currentConnectionService = null;
     public static ConstraintsMap _settings = null;
 
@@ -124,6 +125,7 @@ public class VoiceConnectionService extends ConnectionService {
     public static void deinitConnection(String connectionId) {
         Log.d(TAG, "deinitConnection:" + connectionId);
         VoiceConnectionService.hasOutgoingCall = false;
+        VoiceConnectionService.isCalling = false;
 
         currentConnectionService.stopForegroundService();
 
@@ -135,7 +137,7 @@ public class VoiceConnectionService extends ConnectionService {
     @Override
     public Connection onCreateIncomingConnection(PhoneAccountHandle connectionManagerPhoneAccount, ConnectionRequest request) {
         Log.d(TAG, "onCreateIncomingConnection ::: ");
-
+        VoiceConnectionService.isCalling = true;
         Bundle extra = request.getExtras();
         Uri number = request.getAddress();
         String name = extra.getString(EXTRA_CALLER_NAME);
@@ -153,15 +155,40 @@ public class VoiceConnectionService extends ConnectionService {
     public Connection onCreateOutgoingConnection(PhoneAccountHandle connectionManagerPhoneAccount, ConnectionRequest request) {
         Log.d(TAG, "onCreateOutgoingConnection ::: ");
         VoiceConnectionService.hasOutgoingCall = true;
-        String uuid = UUID.randomUUID().toString();
+//        String uuid = UUID.randomUUID().toString();
 
-        if (!isInitialized && !isReachable) {
-            this.notReachableCallUuid = uuid;
-            this.currentConnectionRequest = request;
-            this.checkReachability();
+//        if (!isInitialized && !isReachable) {
+//            this.notReachableCallUuid = uuid;
+//            this.currentConnectionRequest = request;
+//            this.checkReachability();
+//        }
+
+        Bundle extras = request.getExtras();
+
+        String number = request.getAddress().getSchemeSpecificPart();
+        String extrasNumber = extras.getString(EXTRA_CALL_NUMBER);
+        String displayName = extras.getString(EXTRA_CALLER_NAME);
+        Connection outgoingCallConnection = createConnection(request, false);
+        outgoingCallConnection.setDialing();
+        outgoingCallConnection.setAudioModeIsVoip(true);
+        outgoingCallConnection.setCallerDisplayName(displayName, TelecomManager.PRESENTATION_ALLOWED);
+
+//        startForegroundService();
+
+        // ‍️Weirdly on some Samsung phones (A50, S9...) using `setInitialized` will not display the native UI ...
+        // when making a call from the native Phone application. The call will still be displayed correctly without it.
+        if (!Build.MANUFACTURER.equalsIgnoreCase("Samsung")) {
+            outgoingCallConnection.setInitialized();
         }
 
-        return this.makeOutgoingCall(request, uuid, false);
+        HashMap<String, String> extrasMap = this.bundleToMap(extras);
+
+        sendCallRequestToActivity(ACTION_ONGOING_CALL, extrasMap);
+        sendCallRequestToActivity(ACTION_AUDIO_SESSION, extrasMap);
+
+        return outgoingCallConnection;
+
+//        return this.makeOutgoingCall(request, uuid, false);
     }
 
     private Connection makeOutgoingCall(ConnectionRequest request, String uuid, Boolean forceWakeUp) {

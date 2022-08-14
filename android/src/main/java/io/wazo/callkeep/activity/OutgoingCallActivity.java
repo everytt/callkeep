@@ -8,15 +8,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
-import android.os.Vibrator;
-
-import android.telecom.Connection;
 import android.telecom.DisconnectCause;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -27,6 +24,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import java.util.Calendar;
+import java.util.HashMap;
 
 import io.wazo.callkeep.Constants;
 import io.wazo.callkeep.R;
@@ -34,11 +32,8 @@ import io.wazo.callkeep.VoiceConnection;
 import io.wazo.callkeep.VoiceConnectionService;
 import io.wazo.callkeep.activity.listener.DebouncedOnClickListener;
 
-public class OutgoingCallActivity extends Activity {
-    public static final String EXTRA_KEY_PHONE_NUMBER = "extra_key_phone_number";
-    public static final String EXTRA_KEY_USER_ID = "extra_key_user_id";
-    public static final String EXTRA_KEY_USER_SIM_IMSI = "extra_key_user_sim_imsi";
-
+public class OutgoingCallActivity extends Activity implements VoiceConnection.ConnectionListener {
+    private final String TAG = "OutgoingCallActivity";
 
     private static final int REQUEST_PERMISSION = 19;
 
@@ -61,17 +56,24 @@ public class OutgoingCallActivity extends Activity {
     private String mPhoneNumber;
     private PowerManager.WakeLock mProximityWakeLock;
 
+    private String toast_no_pair_bluetooth;
+
     private long mStartTime;
     private Handler mHandler = new Handler();
 
     private BluetoothAdapter mBluetoothAdapter;
-
-    // junseo2
     private boolean timeRunning = false;
 
+    public static Intent getOutgoingCallIntent(Context context, int callId, HashMap handle) {
+        Log.d("OUTGOINGCALL", "getOutgoingCallIntent : $handle");
+        Intent intent = new Intent(Intent.ACTION_MAIN, null);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NO_USER_ACTION | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        intent.setClass(context, OutgoingCallActivity.class);
+        intent.putExtra(Constants.EXTRA_CALL_ID, callId);
+        intent.putExtra(Constants.EXTRA_CALL_HANDLE, handle);
+        return intent;
+    }
 
-    private String mUserId;
-    private String mUserSimImsi;
 
     @SuppressLint("DefaultLocale")
     private Runnable mTimerRunnable = new Runnable() {
@@ -105,18 +107,34 @@ public class OutgoingCallActivity extends Activity {
 
         Intent intent = getIntent();
         int callId = intent.getIntExtra(Constants.EXTRA_CALL_ID, 0);
+        HashMap<String, String> map = (HashMap) intent.getSerializableExtra(Constants.EXTRA_CALL_HANDLE);
+
+        toast_no_pair_bluetooth = map.get(Constants.EXTRA_TOAST_NO_PAIR_BLUETOOTH);
+        String name = map.get(Constants.EXTRA_CALLER_NAME);
+        String handle = map.get(Constants.EXTRA_CALL_NUMBER);
+
+        Uri uri = Uri.parse(handle);
+        handle  = uri.getSchemeSpecificPart();
         mConnection = (VoiceConnection) VoiceConnectionService.getConnectionById(callId);
+        Log.i(TAG, "showing fullscreen answer ux for call id " + callId);
 
-        init();
-
-
+        mConnection.setListener(this);
+        init(name, handle);
     }
 
-    private void init() {
+    private void init(String name, String handle) {
         initWakeLock();
 
+        if(name == null || name.isEmpty()) {
+            name = handle;
+            handle = "";
+        }
+
         mTextName = findViewById(R.id.text_name);
+        mTextName.setText(name);
         mTextPhoneNumber = findViewById(R.id.text_phone_number);
+        mTextPhoneNumber.setText(handle);
+
         mTextTimer = findViewById(R.id.text_timer);
 
         mTextWaitingBigMsg = findViewById(R.id.text_waiting_big_msg);
@@ -148,7 +166,7 @@ public class OutgoingCallActivity extends Activity {
                 }
             }
 
-            init();
+//            init();
         }
     }
 
@@ -227,6 +245,7 @@ public class OutgoingCallActivity extends Activity {
                 if(mConnection != null) {
                     mConnection.setConnectionDisconnected(DisconnectCause.LOCAL);
                 }
+//                finish();
             }
         });
 
@@ -235,16 +254,19 @@ public class OutgoingCallActivity extends Activity {
             public void onDebouncedClick(View view) {
                 if(mConnection != null) {
                     mConnection.setConnectionDisconnected(DisconnectCause.LOCAL);
-                }            }
+                }
+//                finish();
+
+            }
         });
-//
+
         mBtnBluetooth.setOnClickListener(new DebouncedOnClickListener() {
             @Override
             public void onDebouncedClick(View v) {
                 if (isBluetoothAvailable()) {
                     changeToBlueTooth();
                 } else {
-                    Toast.makeText(getApplicationContext(), "R.string.msg_there_is_no_paired_bluetooth", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), toast_no_pair_bluetooth, Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -286,7 +308,7 @@ public class OutgoingCallActivity extends Activity {
                     mBtnBluetooth.setBackgroundResource(R.drawable.call_btn_bluetooth_on);
                 }
             } else {
-                Toast.makeText(getApplicationContext(), "R.string.msg_there_is_no_paired_bluetooth", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), toast_no_pair_bluetooth, Toast.LENGTH_SHORT).show();
             }
 
             mBtnSpeak.setBackgroundResource(mAudioManager.isSpeakerphoneOn() ?
@@ -346,4 +368,20 @@ public class OutgoingCallActivity extends Activity {
         moveTaskToBack(true);
     }
 
+    @Override
+    public void onActive() {
+        Log.i(TAG, "onActive");
+        switchCallingView(true);
+    }
+
+    @Override
+    public void onDisconnected() {
+        finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        stopTimer();
+        super.onDestroy();
+    }
 }

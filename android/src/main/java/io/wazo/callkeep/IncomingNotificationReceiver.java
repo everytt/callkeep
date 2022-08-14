@@ -16,6 +16,22 @@ public class IncomingNotificationReceiver extends BroadcastReceiver  {
     public static final String ACTION_REJECT_CALL =
             "io.wazo.callkeep.action.REJECT_CALL";
 
+    public static Intent getAcceptIntent(Context context, int callId) {
+        Intent intent = new Intent(
+                IncomingNotificationReceiver.ACTION_ANSWER_CALL, null, context,
+                IncomingNotificationReceiver.class);
+        intent.putExtra(Constants.EXTRA_CALL_ID, callId);
+        return intent;
+    }
+
+    public static Intent getDeclineIntent(Context context, int callId) {
+        Intent intent = new Intent(
+                IncomingNotificationReceiver.ACTION_REJECT_CALL, null, context,
+                IncomingNotificationReceiver.class);
+        intent.putExtra(Constants.EXTRA_CALL_ID, callId);
+        return intent;
+    }
+
     @Override
     public void onReceive(Context context, Intent intent) {
 
@@ -29,16 +45,15 @@ public class IncomingNotificationReceiver extends BroadcastReceiver  {
         switch (action) {
             case ACTION_ANSWER_CALL:
                 if(connection != null) {
-                    connection.setActive();
+                    connection.onAnswer();
                 }
-                notificationManager.cancel(CALL_NOTIFICATION, callId);
+//                notificationManager.cancel(CALL_NOTIFICATION, callId);
                 break;
             case ACTION_REJECT_CALL:
                 if(connection != null) {
                     connection.setConnectionDisconnected(DisconnectCause.REJECTED);
                     connection.destroy();
-                }connection.setConnectionDisconnected(DisconnectCause.REJECTED);
-                connection.destroy();
+                }
                 notificationManager.cancel(CALL_NOTIFICATION, callId);
                 break;
 

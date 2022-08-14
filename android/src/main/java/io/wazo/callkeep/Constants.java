@@ -2,9 +2,6 @@ package io.wazo.callkeep;
 
 public class Constants {
 
-    public static final String EXTRA_CALL_ID = "io.wazo.callkeep.extra.CALL_ID";
-
-
     public static final String ACTION_ANSWER_CALL = "ACTION_ANSWER_CALL";
     public static final String ACTION_AUDIO_SESSION = "ACTION_AUDIO_SESSION";
     public static final String ACTION_CHECK_REACHABILITY = "ACTION_CHECK_REACHABILITY";
@@ -17,9 +14,17 @@ public class Constants {
     public static final String ACTION_UNMUTE_CALL = "ACTION_UNMUTE_CALL";
     public static final String ACTION_WAKE_APP = "ACTION_WAKE_APP";
 
+    public static final String INCOMING_CHANNEL_ID = "INCOMING_CALL_CHANNEL_ID";
+    public static final String INCOMING_CHANNEL_NAME = "INCOMING_CALL";
+
+    public static final String EXTRA_CALL_ID = "EXTRA_CALL_ID";
     public static final String EXTRA_CALL_NUMBER = "EXTRA_CALL_NUMBER";
     public static final String EXTRA_CALL_UUID = "EXTRA_CALL_UUID";
     public static final String EXTRA_CALLER_NAME = "EXTRA_CALLER_NAME";
+    public static final String EXTRA_CALL_ACCEPTED = "EXTRA_CALL_ACCEPTED";
+    public static final String EXTRA_CALL_HANDLE = "EXTRA_CALL_HANDLE";
+
+    public static final String EXTRA_TOAST_NO_PAIR_BLUETOOTH = "EXTRA_TOAST_NO_PAIR_BLUETOOTH";
 
     public static final int FOREGROUND_SERVICE_TYPE_MICROPHONE = 128;
 }

@@ -226,6 +226,9 @@ public class CallKeepModule {
         }
         VoiceConnectionService.setAvailable(false);
         this._settings = options;
+
+        String toast = _settings.getString("toast_no_paired_bluetooth");
+
         if (isConnectionServiceAvailable()) {
             this.registerPhoneAccount();
             this.registerEvents();
@@ -267,6 +270,7 @@ public class CallKeepModule {
         extras.putParcelable(TelecomManager.EXTRA_INCOMING_CALL_ADDRESS, uri);
         extras.putString(EXTRA_CALLER_NAME, callerName);
         extras.putString(EXTRA_CALL_UUID, uuid);
+        extras.putString(EXTRA_TOAST_NO_PAIR_BLUETOOTH, _settings.getString("toast_no_paired_bluetooth"));
 
         telecomManager.addNewIncomingCall(handle, extras);
     }
@@ -287,7 +291,7 @@ public class CallKeepModule {
 
     
     public void startCall(String uuid, String number, String callerName) {
-        if (!isConnectionServiceAvailable() || !hasPhoneAccount() || !hasPermissions() || number == null) {
+        if (!isConnectionServiceAvailable() || !hasPhoneAccount()) {
             return;
         }
 
@@ -300,9 +304,11 @@ public class CallKeepModule {
         callExtras.putString(EXTRA_CALLER_NAME, callerName);
         callExtras.putString(EXTRA_CALL_UUID, uuid);
         callExtras.putString(EXTRA_CALL_NUMBER, number);
+        callExtras.putString(EXTRA_TOAST_NO_PAIR_BLUETOOTH, _settings.getString("toast_no_paired_bluetooth"));
 
         extras.putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, handle);
         extras.putParcelable(TelecomManager.EXTRA_OUTGOING_CALL_EXTRAS, callExtras);
+
 
         telecomManager.placeCall(uri, extras);
     }

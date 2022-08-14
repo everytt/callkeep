@@ -190,7 +190,7 @@ class _MyAppState extends State<HomePage> {
     });
     print('[didReceiveStartCallAction] $callUUID, number: ${event.handle}');
 
-    _callKeep.startCall(callUUID, event.handle, event.handle);
+    // _callKeep.startCall(callUUID, event.handle, event.handle);
 
     Timer(const Duration(seconds: 1), () {
       print('[setCurrentCallActive] $callUUID, number: ${event.handle}');
@@ -233,6 +233,14 @@ class _MyAppState extends State<HomePage> {
     final String handle = calls[callUUID].number;
     print('[setMutedCall: $muted] $callUUID, number: $handle');
     setCallMuted(callUUID, muted);
+  }
+
+  Future<void> setActive(String callUUID) {
+    _callKeep.setCurrentCallActive(callUUID);
+    final String handle = calls[callUUID].number;
+
+    print('[setActive] $callUUID, number: $handle');
+
   }
 
   Future<void> updateDisplay(String callUUID) async {
@@ -349,6 +357,7 @@ class _MyAppState extends State<HomePage> {
             'This application needs to access your phone accounts',
         'cancelButton': 'Cancel',
         'okButton': 'ok',
+        'toast_no_paired_bluetooth': 'i have a toast message',
         'foregroundService': {
           'channelId': 'com.company.my',
           'channelName': 'Foreground service for my app',
@@ -423,6 +432,12 @@ class _MyAppState extends State<HomePage> {
                           setMutedCall(item.key, !item.value.muted);
                         },
                         child: Text(item.value.muted ? 'Unmute' : 'Mute'),
+                      ),
+                      RaisedButton(
+                        onPressed: () async {
+                          setActive(item.key);
+                        },
+                        child: Text("setActive"),
                       ),
                       RaisedButton(
                         onPressed: () async {

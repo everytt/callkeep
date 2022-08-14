@@ -8,6 +8,7 @@ import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,8 +20,10 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Calendar;
+import java.util.HashMap;
 
 import io.wazo.callkeep.Constants;
 import io.wazo.callkeep.R;
@@ -28,24 +31,13 @@ import io.wazo.callkeep.VoiceConnection;
 import io.wazo.callkeep.VoiceConnectionService;
 import io.wazo.callkeep.activity.listener.DebouncedOnClickListener;
 
-import static io.wazo.callkeep.Constants.EXTRA_CALL_ID;
-
-
-public class IncomingCallActivity extends Activity {
+public class IncomingCallActivity extends Activity implements VoiceConnection.ConnectionListener {
     public static final String TAG = "IncomingCallActivity";
-
-    public static final String EXTRA_KEY_FRIEND_NAME = "IncomingCallActivity.extra_key_friend_name";
-    public static final String EXTRA_KEY_FRIEND_ID = "IncomingCallActivity.extra_key_friend_id";
-    public static final String EXTRA_KEY_RECEIVED_MSG = "extra_key_received_msg";
-    public static final int CALL_NOTI_ID = 909;
-    public static final int CALL_NOTI_ONGOING_ID = 90;
 
     private VoiceConnection mConnection;
     private AudioManager mAudioManager;
 
     private TextView mTextTimer;
-
-    // incoming
     private PanelLeft mBtnAnswer;
     private PanelRight mBtnIgnore;
 
@@ -62,6 +54,19 @@ public class IncomingCallActivity extends Activity {
     private long mStartTime;
     private Handler mHandler = new Handler();
     private BluetoothAdapter mBluetoothAdapter;
+    private String toast_no_pair_bluetooth;
+
+
+    public static Intent getIncomingCallIntent(Context context, int callId, boolean accepted, HashMap map) {
+        Intent intent = new Intent(Intent.ACTION_MAIN, null);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NO_USER_ACTION | Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setClass(context, IncomingCallActivity.class);
+        intent.putExtra(Constants.EXTRA_CALL_ID, callId);
+        intent.putExtra(Constants.EXTRA_CALL_ACCEPTED, accepted);
+        intent.putExtra(Constants.EXTRA_CALL_HANDLE, map);
+        return intent;
+    }
+
 
     @SuppressLint("DefaultLocale")
     private Runnable mTimerRunnable = new Runnable() {
@@ -86,8 +91,6 @@ public class IncomingCallActivity extends Activity {
 
         initWindowFlag();
 
-        setContentView(R.layout.activity_incoming_call);
-
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O_MR1) {
             setShowWhenLocked(true);
             setTurnScreenOn(true);
@@ -102,7 +105,26 @@ public class IncomingCallActivity extends Activity {
         int callId = intent.getIntExtra(Constants.EXTRA_CALL_ID, 0);
         Log.i(TAG, "showing fullscreen answer ux for call id " + callId);
 
+        boolean accepted = intent.getBooleanExtra(Constants.EXTRA_CALL_ACCEPTED, false);
+        HashMap<String, String> map = (HashMap) intent.getSerializableExtra(Constants.EXTRA_CALL_HANDLE);
+
+        toast_no_pair_bluetooth = map.get(Constants.EXTRA_TOAST_NO_PAIR_BLUETOOTH);
+        String name = map.get(Constants.EXTRA_CALLER_NAME);
+
+        String handle = map.get(Constants.EXTRA_CALL_NUMBER);
+        Uri uri = Uri.parse(handle);
+        handle  = uri.getSchemeSpecificPart();
+
+        if(name == null || name.isEmpty()) {
+            name = handle;
+            handle = "";
+        }
+
+
+        setContentView(R.layout.activity_incoming_call);
+
         mConnection = (VoiceConnection) VoiceConnectionService.getConnectionById(callId);
+        if(mConnection != null) mConnection.setListener(this);
 
         initWakeLock();
 
@@ -111,11 +133,10 @@ public class IncomingCallActivity extends Activity {
         }
         mTextTimer = (TextView) findViewById(R.id.text_timer);
 
-
         TextView textName = (TextView) findViewById(R.id.text_name);
-//        textName.setText(name);
+        textName.setText(name);
         TextView textNumber = (TextView) findViewById(R.id.text_phone_number);
-//        textNumber.setText(handle);
+        textNumber.setText(handle);
 
         TextView textReceiverName = findViewById(R.id.text_receiver_from_server);
 //        textReceiverName.setText(mReceiverName);
@@ -129,11 +150,11 @@ public class IncomingCallActivity extends Activity {
         mContainerCallingBtn = findViewById(R.id.container_calling);
         mContainerWaitingBtn = findViewById(R.id.container_waiting);
 
-        switchCallingView(false);
-
         initListener();
 
         initAudioManager();
+        switchCallingView(accepted);
+
     }
 
     private void initWindowFlag() {
@@ -197,7 +218,7 @@ public class IncomingCallActivity extends Activity {
             @Override
             public void onPanelEnd() {
                 if(mConnection != null) mConnection.onAnswer();
-//                switchCallingView(true);
+                switchCallingView(true);
 
             }
         });
@@ -209,13 +230,18 @@ public class IncomingCallActivity extends Activity {
                     mConnection.setConnectionDisconnected(DisconnectCause.REJECTED);
                     mConnection.destroy();
                 }
-                finish();
+//                finish();
             }
         });
 
         mBtnEnd.setOnClickListener(new DebouncedOnClickListener() {
             @Override
             public void onDebouncedClick(View view) {
+                if(mConnection != null) {
+                    mConnection.setConnectionDisconnected(DisconnectCause.LOCAL);
+                    mConnection.destroy();
+                }
+//                finish();
             }
         });
 
@@ -225,6 +251,7 @@ public class IncomingCallActivity extends Activity {
                 if (isBluetoothAvailable()) {
                     changeToBlueTooth();
                 } else {
+                    Toast.makeText(getApplicationContext(), toast_no_pair_bluetooth, Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -306,7 +333,7 @@ public class IncomingCallActivity extends Activity {
                     mBtnBluetooth.setBackgroundResource(R.drawable.call_btn_bluetooth_on);
                 }
             } else {
-//                Toast.makeText(getApplicationContext(), R.string.msg_there_is_no_paired_bluetooth, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), toast_no_pair_bluetooth, Toast.LENGTH_SHORT).show();
             }
 
             mBtnSpeak.setBackgroundResource(mAudioManager.isSpeakerphoneOn() ?
@@ -333,5 +360,21 @@ public class IncomingCallActivity extends Activity {
         Log.i(getClass().getSimpleName(), "moveTaskToBack!");
 
         moveTaskToBack(true);
+    }
+
+    @Override
+    protected void onDestroy() {
+        stopTimer();
+        super.onDestroy();
+    }
+
+    @Override
+    public void onActive() {
+        // ignore
+    }
+
+    @Override
+    public void onDisconnected() {
+        finish();
     }
 }

@@ -38,11 +38,11 @@ import android.telecom.Connection;
 import android.telecom.DisconnectCause;
 import android.telecom.TelecomManager;
 import android.util.Log;
+import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import java.util.HashMap;
@@ -67,9 +67,20 @@ public class VoiceConnection extends Connection {
     private final int mCallId;
     private static final String TAG = "[Flutter] RNCK:VoiceConnection";
 
+    private RemoteViews notiView;
+
+    public interface ConnectionListener {
+        void onActive();
+        void onDisconnected();
+    }
+
+    private ConnectionListener mListener;
+
 
     VoiceConnection(Context context, HashMap<String, String> handle, boolean isIncomingCall) {
         super();
+        Log.d(TAG, "createVoiceConnection : " +handle);
+
         this.handle = handle;
         this.context = context;
         mCallId = sNextCallId++;
@@ -90,16 +101,29 @@ public class VoiceConnection extends Connection {
         return mCallId;
     }
 
+    public void setListener (ConnectionListener listener){
+        mListener = listener;
+    }
+
+    private PendingIntent getAcceptPendingIntent(Context context, int callId) {
+        Intent acceptIntent = IncomingNotificationReceiver.getAcceptIntent(context, callId);
+        return PendingIntent.getBroadcast(context, 0, acceptIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    private PendingIntent getDeclinePendingIntent(Context context, int callId) {
+        Intent rejectIntent = IncomingNotificationReceiver.getDeclineIntent(context, callId);
+        return PendingIntent.getBroadcast(context, 0, rejectIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
     @Override
     public void onShowIncomingCallUi() {
 //        super.onShowIncomingCallUi();
-        Log.i(TAG, "onShowIncomingCallUi ++");
+        Log.i(TAG, "onShowIncomingCallUi ++ " + mCallId);
         createNotificationChanel();
-        Intent intent = new Intent(Intent.ACTION_MAIN, null);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NO_USER_ACTION | Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.setClass(context, IncomingCallActivity.class);
-        intent.putExtra(Constants.EXTRA_CALL_ID, mCallId);
-        PendingIntent pi = PendingIntent.getActivity(context, 1, intent, 0);
+        Intent intent = IncomingCallActivity.getIncomingCallIntent(context, mCallId, false, handle);
+        PendingIntent pi = PendingIntent.getActivity(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         Notification.Builder builder = new Notification.Builder(context);
         builder.setOngoing(true);
@@ -107,7 +131,6 @@ public class VoiceConnection extends Connection {
         builder.setSound(null);
         builder.setVisibility(Notification.VISIBILITY_PUBLIC);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) builder.setChannelId("callkit_incoming_channel_id");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             builder.setCategory(NotificationCompat.CATEGORY_CALL);
         }
@@ -117,41 +140,50 @@ public class VoiceConnection extends Connection {
 
         builder.setContentIntent(pi);
         builder.setFullScreenIntent(pi, true);
-        builder.setSmallIcon(R.drawable.ic_ttgo_big);
 
-        builder.setContentTitle("Your notification title");
-        builder.setContentText("Your notification content.");
-
-        final Intent answerIntent = new Intent(
-                IncomingNotificationReceiver.ACTION_ANSWER_CALL, null, context,
-                IncomingNotificationReceiver.class);
-        answerIntent.putExtra(Constants.EXTRA_CALL_ID, mCallId);
-        final Intent rejectIntent = new Intent(
-                IncomingNotificationReceiver.ACTION_REJECT_CALL, null, context,
-                IncomingNotificationReceiver.class);
-        rejectIntent.putExtra(Constants.EXTRA_CALL_ID, mCallId);
-
+        int resIcon = context.getApplicationInfo().icon;
+        builder.setSmallIcon(resIcon);
+        builder.setColor(ContextCompat.getColor(context, R.color.action_color));
 
         String number = handle.get(EXTRA_CALL_NUMBER);
+        Uri uri = Uri.parse(number);
+        number  = uri.getSchemeSpecificPart();
+
         String name = handle.get(EXTRA_CALLER_NAME);
-        builder.setContentTitle(name);
-        builder.setContentText(number);
 
+        if(name == null || name.isEmpty()) {
+            name = number;
+            number = "";
+        }
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) builder.setChannelId(INCOMING_CALL_CHANNEL_ID);
 
-        builder.addAction(
-                new Notification.Action.Builder(
-                        Icon.createWithResource(context, R.drawable.ic_ttgo_big),
-                        "Answer",
-                        PendingIntent.getBroadcast(context, 0, answerIntent,
-                                PendingIntent.FLAG_UPDATE_CURRENT))
-                        .build());
-        builder.addAction(
-                new Notification.Action.Builder(
-                        Icon.createWithResource(context, R.drawable.ic_ttgo_big),
-                        "Reject",
-                        PendingIntent.getBroadcast(context, 0, rejectIntent,
-                                PendingIntent.FLAG_UPDATE_CURRENT))
-                        .build());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            notiView = new RemoteViews(context.getPackageName(), R.layout.custom_notification);
+            notiView.setTextViewText(R.id.tvNameCaller, name);
+            notiView.setTextViewText(R.id.tvNumber, number);
+            notiView.setOnClickPendingIntent(R.id.llAccept, getAcceptPendingIntent(context, mCallId));
+            notiView.setOnClickPendingIntent(R.id.llDecline, getDeclinePendingIntent(context,mCallId));
+
+            builder.setStyle(new Notification.DecoratedCustomViewStyle());
+            builder.setCustomContentView(notiView);
+            builder.setCustomHeadsUpContentView(notiView);
+            builder.setCustomBigContentView(notiView);
+        } else {
+            builder.setContentTitle(name);
+            builder.setContentText(number);
+            builder.addAction(
+                    new Notification.Action.Builder(
+                            Icon.createWithResource(context, R.drawable.ic_accept),
+                            "Accept",
+                            getAcceptPendingIntent(context, mCallId))
+                            .build());
+            builder.addAction(
+                    new Notification.Action.Builder(
+                            Icon.createWithResource(context, R.drawable.ic_decline),
+                            "Decline",
+                            getDeclinePendingIntent(context, mCallId))
+                            .build());
+        }
 
         Notification notification = builder.build();
         notification.flags |= Notification.FLAG_INSISTENT;
@@ -163,9 +195,9 @@ public class VoiceConnection extends Connection {
     private void createNotificationChanel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channelCall = new NotificationChannel(
-                    "callkit_incoming_channel_id",
-                    "Incoming Call",
-                    NotificationManager.IMPORTANCE_MAX
+                    INCOMING_CHANNEL_ID,
+                    INCOMING_CHANNEL_NAME,
+                    NotificationManager.IMPORTANCE_HIGH
             );
 
             channelCall.setDescription("");
@@ -186,6 +218,11 @@ public class VoiceConnection extends Connection {
         }
     }
 
+    public void cancelNotification() {
+        NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
+        notificationManager.cancel(CALL_NOTIFICATION, mCallId);
+    }
+
 
     @Override
     public void onExtrasChanged(Bundle extras) {
@@ -201,9 +238,13 @@ public class VoiceConnection extends Connection {
         Log.d(TAG, "onStateChanged : " + state);
 
         if(state == Connection.STATE_DIALING) {
-            Intent intent = new Intent(context, OutgoingCallActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            Log.d(TAG, "onStateChanged : " + state);
+            Intent intent = OutgoingCallActivity.getOutgoingCallIntent(context, mCallId, handle);
             context.startActivity(intent);
+        } else if(state == Connection.STATE_ACTIVE) {
+            if(mListener != null) mListener.onActive();
+        } else if(state == Connection.STATE_DISCONNECTED) {
+            if(mListener != null) mListener.onDisconnected();
         }
 
         super.onStateChanged(state);
@@ -230,8 +271,12 @@ public class VoiceConnection extends Connection {
     public void onAnswer(int videoState) {
         super.onAnswer(videoState);
         Log.d(TAG, "onAnswer videoState called: " + videoState);
-
 //        setConnectionCapabilities(getConnectionCapabilities() | Connection.CAPABILITY_HOLD);
+
+        Intent intent = IncomingCallActivity.getIncomingCallIntent(context, mCallId, true, handle);
+        context.startActivity(intent);
+
+        cancelNotification();
         setAudioModeIsVoip(true);
 
         sendCallRequestToActivity(ACTION_ANSWER_CALL, handle);
@@ -264,14 +309,19 @@ public class VoiceConnection extends Connection {
         destroy();
     }
 
-    public void setConnectionDisconnected(int cause) {
-        Log.d(TAG, "setConnectionDisconnected :: $cause");
 
-        NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
-        notificationManager.cancel(CALL_NOTIFICATION, mCallId);
-        setDisconnected(new DisconnectCause(cause));
+
+    public void setConnectionDisconnected(int cause) {
+//        Log.d(TAG, "setConnectionDisconnected :: $cause");
+        DisconnectCause c = new DisconnectCause(cause);
+
+        Log.d(TAG, "setConnectionDisconnected :: "+ c);
+
+        if(mIsIncomingCall && cause == DisconnectCause.REJECTED) cancelNotification();
+        setDisconnected(c);
 
         sendCallRequestToActivity(ACTION_END_CALL, handle);
+        ((VoiceConnectionService)context).deinitConnection(handle.get(EXTRA_CALL_UUID));
         destroy();
 
         // listener
