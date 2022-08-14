@@ -24,6 +24,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.Icon;
 import android.media.AudioAttributes;
@@ -41,6 +42,7 @@ import android.util.Log;
 import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -51,6 +53,7 @@ import static io.wazo.callkeep.Constants.*;
 
 import io.wazo.callkeep.activity.IncomingCallActivity;
 import io.wazo.callkeep.activity.OutgoingCallActivity;
+import io.wazo.callkeep.utils.ConstraintsMap;
 
 @TargetApi(Build.VERSION_CODES.M)
 public class VoiceConnection extends Connection {
@@ -277,6 +280,16 @@ public class VoiceConnection extends Connection {
         context.startActivity(intent);
 
         cancelNotification();
+        String name = handle.get(Constants.EXTRA_CALLER_NAME);
+
+        if(name == null || name.isEmpty()) {
+            String number = handle.get(Constants.EXTRA_CALL_NUMBER);
+            Uri uri = Uri.parse(number);
+            number  = uri.getSchemeSpecificPart();
+
+            name = number;
+        }
+        ((VoiceConnectionService) context).startForegroundService(name);
         setAudioModeIsVoip(true);
 
         sendCallRequestToActivity(ACTION_ANSWER_CALL, handle);

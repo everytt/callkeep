@@ -73,6 +73,8 @@ public class VoiceConnectionService extends ConnectionService {
     public static VoiceConnectionService currentConnectionService = null;
     public static ConstraintsMap _settings = null;
 
+    public static final String ONGOING_CHANNEL_ID = "io.winehouse.ttgo.call";
+
     public static Connection getConnection(String connectionId) {
         if (currentConnections.containsKey(connectionId)) {
             return currentConnections.get(connectionId);
@@ -173,7 +175,14 @@ public class VoiceConnectionService extends ConnectionService {
         outgoingCallConnection.setAudioModeIsVoip(true);
         outgoingCallConnection.setCallerDisplayName(displayName, TelecomManager.PRESENTATION_ALLOWED);
 
-//        startForegroundService();
+
+        String displayServiceTitle = displayName;
+        if(displayName == null || displayName.isEmpty()) {
+            Uri uri = Uri.parse(extrasNumber);
+            displayServiceTitle  = uri.getSchemeSpecificPart();
+        }
+
+        startForegroundService(displayServiceTitle);
 
         // ‍️Weirdly on some Samsung phones (A50, S9...) using `setInitialized` will not display the native UI ...
         // when making a call from the native Phone application. The call will still be displayed correctly without it.
@@ -240,7 +249,7 @@ public class VoiceConnectionService extends ConnectionService {
         return outgoingCallConnection;
     }
 
-    private void startForegroundService() {
+    public void startForegroundService(String endPoint) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             // Foreground services not required before SDK 28
             return;
@@ -251,36 +260,23 @@ public class VoiceConnectionService extends ConnectionService {
             return;
         }
         ConstraintsMap foregroundSettings = _settings.getMap("foregroundService");
-        String NOTIFICATION_CHANNEL_ID = foregroundSettings.getString("channelId");
-        String channelName = foregroundSettings.getString("channelName");
-        NotificationChannel chan = new NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_NONE);
+        String notificationContent = foregroundSettings.getString("notificationContent");
+
+        NotificationChannel chan = new NotificationChannel(ONGOING_CHANNEL_ID, getApplicationInfo().name, NotificationManager.IMPORTANCE_NONE);
         chan.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
         NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         assert manager != null;
         manager.createNotificationChannel(chan);
 
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID);
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, ONGOING_CHANNEL_ID);
         notificationBuilder.setOngoing(true)
-                .setContentTitle(foregroundSettings.getString("notificationTitle"))
+                .setContentTitle(endPoint)
+                .setContentText(notificationContent)
                 .setPriority(NotificationManager.IMPORTANCE_MIN)
                 .setCategory(Notification.CATEGORY_SERVICE);
-        
-        if (foregroundSettings.hasKey("notificationIcon")) {
-            Context context = this.getApplicationContext();
-            Resources res = context.getResources();
-            String smallIcon = foregroundSettings.getString("notificationIcon");
-            String mipmap = "mipmap/";
-            String drawable = "drawable/";
-            if (smallIcon.contains(mipmap)) {
-                notificationBuilder.setSmallIcon(
-                        res.getIdentifier(smallIcon.replace(mipmap, ""),
-                                "mipmap", context.getPackageName()));
-            } else if (smallIcon.contains(drawable)) {
-                notificationBuilder.setSmallIcon(
-                        res.getIdentifier(smallIcon.replace(drawable, ""),
-                                "drawable", context.getPackageName()));
-            }
-        }
+
+        int resIcon = getApplicationInfo().icon;
+        notificationBuilder.setSmallIcon(resIcon);
 
         Log.d(TAG, "[VoiceConnectionService] Starting foreground service");
 

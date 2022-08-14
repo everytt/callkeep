@@ -382,6 +382,14 @@ public class OutgoingCallActivity extends Activity implements VoiceConnection.Co
     @Override
     protected void onDestroy() {
         stopTimer();
+
+        if (mProximityWakeLock != null) {
+            if (mProximityWakeLock.isHeld()) {
+                mProximityWakeLock.release();
+            }
+            mProximityWakeLock = null;
+        }
+
         super.onDestroy();
     }
 }

@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
@@ -95,10 +96,10 @@ public class IncomingCallActivity extends Activity implements VoiceConnection.Co
             setShowWhenLocked(true);
             setTurnScreenOn(true);
         } else {
-//            window.addFlags(
-//                    WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
-//                    WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
-//            );
+            getWindow().addFlags(
+                    WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
+                    WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+            );
         }
 
         Intent intent = getIntent();
@@ -120,7 +121,6 @@ public class IncomingCallActivity extends Activity implements VoiceConnection.Co
             handle = "";
         }
 
-
         setContentView(R.layout.activity_incoming_call);
 
         mConnection = (VoiceConnection) VoiceConnectionService.getConnectionById(callId);
@@ -128,9 +128,6 @@ public class IncomingCallActivity extends Activity implements VoiceConnection.Co
 
         initWakeLock();
 
-        if (mProximityWakeLock != null) {
-            mProximityWakeLock.acquire();
-        }
         mTextTimer = (TextView) findViewById(R.id.text_timer);
 
         TextView textName = (TextView) findViewById(R.id.text_name);
@@ -154,7 +151,6 @@ public class IncomingCallActivity extends Activity implements VoiceConnection.Co
 
         initAudioManager();
         switchCallingView(accepted);
-
     }
 
     private void initWindowFlag() {
@@ -259,6 +255,10 @@ public class IncomingCallActivity extends Activity implements VoiceConnection.Co
 
     private void switchCallingView(boolean hasToSwitch) {
         if (hasToSwitch) {
+            if (mProximityWakeLock != null) {
+                mProximityWakeLock.acquire();
+            }
+
             mContainerCallingBtn.setVisibility(View.VISIBLE);
             mContainerWaitingBtn.setVisibility(View.GONE);
 
@@ -365,7 +365,15 @@ public class IncomingCallActivity extends Activity implements VoiceConnection.Co
     @Override
     protected void onDestroy() {
         stopTimer();
+        if (mProximityWakeLock != null) {
+            if (mProximityWakeLock.isHeld()) {
+                mProximityWakeLock.release();
+            }
+            mProximityWakeLock = null;
+        }
+
         super.onDestroy();
+
     }
 
     @Override

@@ -181,6 +181,10 @@ public class CallKeepModule {
                 hasOutgoingCall(result);
             }
             break;
+            case "isCalling": {
+                isCalling(result);
+            }
+            break;
             case "hasPermissions": {
                 hasPermissions(result);
             }
@@ -226,8 +230,6 @@ public class CallKeepModule {
         }
         VoiceConnectionService.setAvailable(false);
         this._settings = options;
-
-        String toast = _settings.getString("toast_no_paired_bluetooth");
 
         if (isConnectionServiceAvailable()) {
             this.registerPhoneAccount();
@@ -499,6 +501,10 @@ public class CallKeepModule {
     
     public void hasOutgoingCall(@NonNull MethodChannel.Result result) {
         result.success(VoiceConnectionService.hasOutgoingCall);
+    }
+
+    public void isCalling(@NonNull MethodChannel.Result result) {
+        result.success(VoiceConnectionService.isCalling);
     }
 
     
