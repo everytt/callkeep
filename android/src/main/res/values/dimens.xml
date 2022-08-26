@@ -9,6 +9,11 @@
     <dimen name="base_margin_x4">40dp</dimen>
     <dimen name="base_margin_x5">50dp</dimen>
     <dimen name="base_margin_x6">60dp</dimen>
+    <dimen name="base_margin_x8">80dp</dimen>
+
+    <dimen name="padding_notification_button">7dp</dimen>
+    <dimen name="margin_ttgo_big_icon">200dp</dimen>
+    <dimen name="margin_text_top">16dp</dimen>
 
     <dimen name="base_margin_revert_x5">-50dp</dimen>
     <dimen name="size_avatar">120dp</dimen>
@@ -16,6 +21,29 @@
     <dimen name="size_button_x2">120dp</dimen>
     <dimen name="size_button_x2_5">150dp</dimen>
 
-    <dimen name="size_text_name">20dp</dimen>
+    <dimen name="height_calling_area">150dp</dimen>
+
     <dimen name="size_text_action">14dp</dimen>
+    
+    <dimen name="padding_rounded_card_vertical">4dp</dimen>
+    <dimen name="padding_rounded_card_horizontal">25dp</dimen>
+    <dimen name="size_text_timer">12dp</dimen>
+
+    <dimen name="size_text_incoming_call_card">13dp</dimen>
+    <dimen name="size_title_message">20dp</dimen>
+    <dimen name="size_content_message">13dp</dimen>
+    <dimen name="size_text_name">25dp</dimen>
+    <dimen name="size_text_handle">14dp</dimen>
+
+    <dimen name="callscreen_sub_button_size">63dp</dimen>
+    <dimen name="callscreen_main_button_size">73dp</dimen>
+
+    <dimen name="call_panel_height">85dp</dimen>
+    <dimen name="call_panel_button_size">77dp</dimen>
+    <dimen name="call_panel_gradient_width">108dp</dimen>
+    <dimen name="call_panel_gradient_height">65dp</dimen>
+
+    <dimen name="call_panel_margin_horizontal">70dp</dimen>
+    <dimen name="call_panel_margin_vertical">9dp</dimen>
+    <dimen name="call_right_panel_margin_horizontal">34dp</dimen>
 </resources>

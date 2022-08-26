@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:orientation="vertical">
+<!--            android:layout_toStartOf="@id/ivAvatar"-->
+<!--            >-->
+
+            <TextView
+                android:id="@+id/tvNameCaller"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
+                android:textSize="@dimen/size_text_action" />
+
+
+            <TextView
+                android:id="@+id/tvNumber"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.Compat.Notification.Line2"
+                android:textSize="@dimen/size_text_action" />
+
+        </LinearLayout>
+
+
+<!--        <ImageView-->
+<!--            android:id="@+id/ivAvatar"-->
+<!--            android:layout_width="@dimen/base_margin_x4"-->
+<!--            android:layout_height="@dimen/base_margin_x4"-->
+<!--            android:layout_alignParentRight="true"-->
+<!--            android:scaleType="centerCrop"-->
+<!--            android:visibility="invisible" />-->
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:id="@+id/llAccept"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="@dimen/base_margin"
+                android:background="@drawable/bg_button_accept"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingTop="@dimen/padding_notification_button"
+                android:paddingBottom="@dimen/padding_notification_button">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/padding_notification_button"
+                    android:layout_marginRight="@dimen/padding_notification_button"
+                    android:src="@drawable/ic_accept"
+                    android:tint="@android:color/white"
+                    app:tint="@android:color/white"
+                    tools:ignore="UseAppTint" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/llDecline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_button_decline"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingTop="@dimen/padding_notification_button"
+                android:paddingBottom="@dimen/padding_notification_button">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="@dimen/padding_notification_button"
+                    android:layout_marginRight="@dimen/padding_notification_button"
+                    android:src="@drawable/ic_decline"
+                    android:tint="@android:color/white"
+                    app:tint="@android:color/white"
+                    tools:ignore="UseAppTint" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</LinearLayout>

@@ -161,7 +161,7 @@ public class VoiceConnection extends Connection {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) builder.setChannelId(INCOMING_CALL_CHANNEL_ID);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            notiView = new RemoteViews(context.getPackageName(), R.layout.custom_notification);
+            notiView = new RemoteViews(context.getPackageName(), R.layout.custom_notification_small);
             notiView.setTextViewText(R.id.tvNameCaller, name);
             notiView.setTextViewText(R.id.tvNumber, number);
             notiView.setOnClickPendingIntent(R.id.llAccept, getAcceptPendingIntent(context, mCallId));
