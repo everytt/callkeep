@@ -102,6 +102,7 @@ public class OutgoingCallActivity extends Activity implements VoiceConnection.Co
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initWindowFlag();
 
         setContentView(R.layout.activity_outgoing_call);
 
@@ -146,7 +147,6 @@ public class OutgoingCallActivity extends Activity implements VoiceConnection.Co
         mBtnBluetooth = findViewById(R.id.btn_blue_tooth);
 
         switchCallingView(false);
-
         initAudioManager();
 
         initListener();

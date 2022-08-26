@@ -3,23 +3,23 @@
     android:id="@+id/letf_container"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
-    android:layout_height="80dp">
+    android:layout_height="@dimen/call_panel_height">
 
     <ImageView
         android:id="@+id/content"
-        android:layout_width="100dp"
-        android:layout_height="59dp"
+        android:layout_width="@dimen/call_panel_gradient_width"
+        android:layout_height="@dimen/call_panel_gradient_height"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="34dp"
+        android:layout_marginLeft="@dimen/call_right_panel_margin_horizontal"
         android:contentDescription="@string/app_name"
         android:scaleType="fitXY"
         android:src="@drawable/call_gra_right" />
 
     <ImageView
         android:id="@+id/handler"
-        android:layout_width="67dp"
-        android:layout_height="67dp"
-        android:layout_marginTop="9dp"
+        android:layout_width="@dimen/call_panel_button_size"
+        android:layout_height="@dimen/call_panel_button_size"
+        android:layout_marginTop="@dimen/call_panel_margin_vertical"
         android:contentDescription="@string/app_name"
         android:scaleType="fitCenter"
         android:src="@drawable/call_btn_call_stop" />

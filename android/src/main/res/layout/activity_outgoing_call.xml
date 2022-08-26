@@ -15,7 +15,7 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="200dp"
+            android:layout_marginTop="@dimen/margin_ttgo_big_icon"
             android:contentDescription="@string/app_name"
             android:src="@drawable/ic_ttgo_big"/>
         <FrameLayout
@@ -28,14 +28,14 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:textColor="@color/white"
-                android:textSize="25sp"
+                android:textSize="@dimen/size_text_name"
                 android:textStyle="bold"/>
         </FrameLayout>
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp">
+            android:layout_marginTop="@dimen/margin_text_top">
             <TextView
                 android:id="@+id/text_waiting_big_msg"
                 android:layout_width="match_parent"
@@ -43,7 +43,7 @@
                 android:gravity="center"
                 android:text="@string/tcp_text1"
                 android:textColor="@color/white"
-                android:textSize="20sp"
+                android:textSize="@dimen/size_title_message"
                 android:textStyle="bold"/>
             <TextView
                 android:id="@+id/text_phone_number"
@@ -51,12 +51,12 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:textColor="@color/white"
-                android:textSize="14sp"/>
+                android:textSize="@dimen/size_text_handle"/>
         </FrameLayout>
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp">
+            android:layout_marginTop="@dimen/base_margin_x3">
             <TextView
                 android:id="@+id/text_waiting_message"
                 android:layout_width="match_parent"
@@ -64,7 +64,7 @@
                 android:gravity="center"
                 android:text="@string/tcp_text2"
                 android:textColor="@color/white"
-                android:textSize="13sp"/>
+                android:textSize="@dimen/size_content_message"/>
             <TextView
                 android:id="@+id/text_timer"
                 android:layout_width="wrap_content"
@@ -72,12 +72,12 @@
                 android:layout_gravity="center"
                 android:background="@drawable/call_bg_time"
                 android:gravity="center"
-                android:paddingBottom="4dp"
-                android:paddingLeft="24dp"
-                android:paddingRight="24dp"
-                android:paddingTop="4dp"
+                android:paddingBottom="@dimen/padding_rounded_card_vertical"
+                android:paddingLeft="@dimen/padding_rounded_card_horizontal"
+                android:paddingRight="@dimen/padding_rounded_card_horizontal"
+                android:paddingTop="@dimen/padding_rounded_card_vertical"
                 android:textColor="@color/white"
-                android:textSize="12sp"
+                android:textSize="@dimen/size_text_timer"
                 android:textStyle="bold"
                 android:visibility="gone"/>
         </FrameLayout>
@@ -88,8 +88,9 @@
             android:layout_weight="1"/>
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="150dp"
-            android:layout_marginTop="30dp">
+            android:layout_height="@dimen/height_calling_area"
+            android:layout_marginTop="@dimen/base_margin_x3">
+
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/container_calling"
                 android:layout_width="match_parent"
@@ -99,17 +100,17 @@
                 android:visibility="visible">
                 <Button
                     android:id="@+id/btn_speak"
-                    android:layout_width="58dp"
-                    android:layout_height="58dp"
-                    android:background="@drawable/btn_call_speaker"
+                    android:layout_width="@dimen/callscreen_sub_button_size"
+                    android:layout_height="@dimen/callscreen_sub_button_size"
+                    android:background="@drawable/call_btn_call_speaker_off"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toLeftOf="@id/btn_cancel_calling"/>
                 <Button
                     android:id="@+id/btn_cancel_calling"
-                    android:layout_width="68dp"
-                    android:layout_height="68dp"
+                    android:layout_width="@dimen/callscreen_main_button_size"
+                    android:layout_height="@dimen/callscreen_main_button_size"
                     android:background="@drawable/btn_call_cancel"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -117,8 +118,8 @@
                     app:layout_constraintRight_toLeftOf="@id/btn_blue_tooth"/>
                 <Button
                     android:id="@+id/btn_blue_tooth"
-                    android:layout_width="58dp"
-                    android:layout_height="58dp"
+                    android:layout_width="@dimen/callscreen_sub_button_size"
+                    android:layout_height="@dimen/callscreen_sub_button_size"
                     android:background="@drawable/btn_call_bluetooth"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -135,8 +136,8 @@
                 android:visibility="gone">
                 <Button
                     android:id="@+id/btn_cancel_waiting"
-                    android:layout_width="68dp"
-                    android:layout_height="68dp"
+                    android:layout_width="@dimen/callscreen_main_button_size"
+                    android:layout_height="@dimen/callscreen_main_button_size"
                     android:background="@drawable/btn_call_cancel"/>
             </LinearLayout>
         </FrameLayout>
