@@ -110,13 +110,22 @@ public class VoiceConnection extends Connection {
 
     private PendingIntent getAcceptPendingIntent(Context context, int callId) {
         Intent acceptIntent = IncomingNotificationReceiver.getAcceptIntent(context, callId);
-        return PendingIntent.getBroadcast(context, 0, acceptIntent,
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            return PendingIntent.getBroadcast(context, 0, acceptIntent,
+            PendingIntent.FLAG_IMMUTABLE);
+        } else
+            return PendingIntent.getBroadcast(context, 0, acceptIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     private PendingIntent getDeclinePendingIntent(Context context, int callId) {
         Intent rejectIntent = IncomingNotificationReceiver.getDeclineIntent(context, callId);
-        return PendingIntent.getBroadcast(context, 0, rejectIntent,
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            return PendingIntent.getBroadcast(context, 0, rejectIntent,
+            PendingIntent.FLAG_IMMUTABLE);
+        } else
+            return PendingIntent.getBroadcast(context, 0, rejectIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
@@ -126,7 +135,12 @@ public class VoiceConnection extends Connection {
         Log.i(TAG, "onShowIncomingCallUi ++ " + mCallId);
         createNotificationChanel();
         Intent intent = IncomingCallActivity.getIncomingCallIntent(context, mCallId, false, handle);
-        PendingIntent pi = PendingIntent.getActivity(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pi;
+        
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            pi = PendingIntent.getActivity(context, 1, intent, PendingIntent.FLAG_IMMUTABLE);
+        } else 
+            pi = PendingIntent.getActivity(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         Notification.Builder builder = new Notification.Builder(context);
         builder.setOngoing(true);
