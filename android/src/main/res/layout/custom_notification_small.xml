@@ -54,7 +54,7 @@
                 android:id="@+id/llAccept"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="@dimen/base_margin"
+                android:layout_marginRight="@dimen/base_margin_x2"
                 android:background="@drawable/bg_button_accept"
                 android:clickable="true"
                 android:focusable="true"
