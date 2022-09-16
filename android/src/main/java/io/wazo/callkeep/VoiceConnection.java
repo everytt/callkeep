@@ -112,7 +112,7 @@ public class VoiceConnection extends Connection {
         Intent acceptIntent = IncomingNotificationReceiver.getAcceptIntent(context, callId);
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             return PendingIntent.getBroadcast(context, 0, acceptIntent,
-            PendingIntent.FLAG_IMMUTABLE);
+            PendingIntent.FLAG_MUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
         } else
             return PendingIntent.getBroadcast(context, 0, acceptIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
@@ -123,7 +123,7 @@ public class VoiceConnection extends Connection {
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             return PendingIntent.getBroadcast(context, 0, rejectIntent,
-            PendingIntent.FLAG_IMMUTABLE);
+            PendingIntent.FLAG_MUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
         } else
             return PendingIntent.getBroadcast(context, 0, rejectIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
@@ -138,7 +138,7 @@ public class VoiceConnection extends Connection {
         PendingIntent pi;
         
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            pi = PendingIntent.getActivity(context, 1, intent, PendingIntent.FLAG_IMMUTABLE);
+            pi = PendingIntent.getActivity(context, 1, intent, PendingIntent.FLAG_MUTABLE| PendingIntent.FLAG_UPDATE_CURRENT);
         } else 
             pi = PendingIntent.getActivity(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
