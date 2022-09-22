@@ -183,8 +183,8 @@ public class VoiceConnection extends Connection {
 
             builder.setStyle(new Notification.DecoratedCustomViewStyle());
             builder.setCustomContentView(notiView);
-            builder.setCustomHeadsUpContentView(notiView);
-            builder.setCustomBigContentView(notiView);
+            // builder.setCustomHeadsUpContentView(notiView);
+            // builder.setCustomBigContentView(notiView);
         } else {
             builder.setContentTitle(name);
             builder.setContentText(number);
