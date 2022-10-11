@@ -72,7 +72,7 @@ public class IncomingCallActivity extends Activity implements VoiceConnection.Co
     @SuppressLint("DefaultLocale")
     private Runnable mTimerRunnable = new Runnable() {
         @Override
-        public void run() { // todo junseo2 여기가 시간 보여주는곳 버그 있는지 체크 해볼것
+        public void run() {
             long time = (Calendar.getInstance().getTimeInMillis() - mStartTime) / 1000;
 
             long min = time / 60;
@@ -124,9 +124,6 @@ public class IncomingCallActivity extends Activity implements VoiceConnection.Co
         textName.setText(name);
         TextView textNumber = (TextView) findViewById(R.id.text_phone_number);
         textNumber.setText(handle);
-
-        TextView textReceiverName = findViewById(R.id.text_receiver_from_server);
-//        textReceiverName.setText(mReceiverName);
 
         mBtnAnswer = (PanelLeft) findViewById(R.id.panel_left);
         mBtnIgnore = (PanelRight) findViewById(R.id.panel_right);

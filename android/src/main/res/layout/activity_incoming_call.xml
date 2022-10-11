@@ -12,7 +12,7 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/tv_incoming_call_card"
+            android:id="@+id/call_card"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/base_margin_x8"
@@ -22,10 +22,17 @@
             android:paddingLeft="@dimen/padding_rounded_card_horizontal"
             android:paddingRight="@dimen/padding_rounded_card_horizontal"
             android:paddingTop="@dimen/padding_rounded_card_vertical"
-            android:text="Incoming call"
+            android:text="@string/incoming_title_text"
             android:textColor="@color/highlight"
             android:textSize="@dimen/size_text_incoming_call_card"
             android:textStyle="bold" />
+
+        <ImageView
+            android:layout_width="130dp"
+            android:layout_height="70dp"
+            android:layout_marginTop="@dimen/margin_ttgo_big_icon"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/ic_ttgo_main_logo" />
 
         <TextView
             android:id="@+id/text_name"
@@ -33,7 +40,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/base_margin_x5"
             android:gravity="center"
-            android:textColor="@color/white"
+            android:textColor="@color/highlight"
             android:textSize="@dimen/size_text_name"
             android:textStyle="bold" />
 
@@ -45,15 +52,6 @@
             android:gravity="center"
             android:textColor="@color/white"
             android:textSize="@dimen/size_text_handle"/>
-
-        <TextView
-            android:id="@+id/text_receiver_from_server"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:gravity="center"
-            android:textColor="@color/white"
-            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/text_timer"
@@ -134,11 +132,4 @@
         </FrameLayout>
 
     </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@android:color/black"
-        android:clickable="true"
-        android:visibility="gone" />
 </FrameLayout>

@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">TTgo</string>
-    <string name="tcp_text1">Waiting to receive</string>
+    <string name="incoming_title_text">Incoming call</string>
+    <string name="outgoing_title_card_text">Outgoing call</string>
+    <string name="outgoing_title_text">Calling...</string>
     <string name="tcp_text2">Please wait for a while.</string>
     <string name="main_set_text11">Call</string>
     <string name="main_set_text12">Text</string>
+    <string name="toast_no_paired_bluetooth">There is no connected bluetooth..</string>
 </resources>

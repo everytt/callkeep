@@ -111,6 +111,9 @@ public class OutgoingCallActivity extends Activity implements VoiceConnection.Co
         HashMap<String, String> map = (HashMap) intent.getSerializableExtra(Constants.EXTRA_CALL_HANDLE);
 
         toast_no_pair_bluetooth = map.get(Constants.EXTRA_TOAST_NO_PAIR_BLUETOOTH);
+        if(toast_no_pair_bluetooth == null) {
+            toast_no_pair_bluetooth = getString(R.string.toast_no_paired_bluetooth);
+        }
         String name = map.get(Constants.EXTRA_CALLER_NAME);
         String handle = map.get(Constants.EXTRA_CALL_NUMBER);
 
