@@ -13,16 +13,20 @@ class CallKeepDidReceiveStartCallAction extends EventType {
 
 class CallKeepPerformAnswerCallAction extends EventType {
   CallKeepPerformAnswerCallAction();
-  CallKeepPerformAnswerCallAction.fromMap(Map<dynamic, dynamic> arguments)
-      : callUUID = arguments['callUUID'] as String;
+  CallKeepPerformAnswerCallAction.fromMap(Map<dynamic, dynamic> arguments) : callUUID = arguments['callUUID'] as String;
   String? callUUID;
 }
 
 class CallKeepPerformEndCallAction extends EventType {
   CallKeepPerformEndCallAction();
-  CallKeepPerformEndCallAction.fromMap(Map<dynamic, dynamic> arguments)
-      : callUUID = arguments['callUUID'] as String;
+  CallKeepPerformEndCallAction.fromMap(Map<dynamic, dynamic> arguments) : callUUID = arguments['callUUID'] as String;
   String? callUUID;
+}
+
+class CallKeepDidEndedCallToEndPointAction extends EventType {
+  CallKeepDidEndedCallToEndPointAction();
+  String? reason;
+  CallKeepDidEndedCallToEndPointAction.fromMap(Map<dynamic, dynamic> arguemnts) : reason = arguemnts["reason"] as String;
 }
 
 class CallKeepDidActivateAudioSession extends EventType {
@@ -41,13 +45,13 @@ class CallKeepDidDisplayIncomingCall extends EventType {
         localizedCallerName = arguments['localizedCallerName'] as String,
         hasVideo = arguments['hasVideo'] as bool,
         fromPushKit = arguments['fromPushKit'] as bool,
-        payload = arguments['payload'] as Map<dynamic,dynamic>;
+        payload = arguments['payload'] as Map<dynamic, dynamic>;
   String? callUUID;
   String? handle;
   String? localizedCallerName;
   bool? hasVideo;
   bool? fromPushKit;
-  Map<dynamic,dynamic>? payload;
+  Map<dynamic, dynamic>? payload;
 }
 
 class CallKeepDidPerformSetMutedCallAction extends EventType {
@@ -91,7 +95,6 @@ class CallKeepDidLoadWithEvents extends EventType {
 
 class CallKeepPushKitToken extends EventType {
   CallKeepPushKitToken();
-  CallKeepPushKitToken.fromMap(Map<dynamic, dynamic> arguments)
-      : token = arguments['token'] as String;
+  CallKeepPushKitToken.fromMap(Map<dynamic, dynamic> arguments) : token = arguments['token'] as String;
   String? token;
 }

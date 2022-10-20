@@ -14,6 +14,7 @@ static NSString *const CallKeepHandleStartCallNotification = @"CallKeepHandleSta
 static NSString *const CallKeepDidReceiveStartCallAction = @"CallKeepDidReceiveStartCallAction";
 static NSString *const CallKeepPerformAnswerCallAction = @"CallKeepPerformAnswerCallAction";
 static NSString *const CallKeepPerformEndCallAction = @"CallKeepPerformEndCallAction";
+static NSString *const CallKeepDidEndedCallToEndPointAction = @"CallKeepDidEndedCallToEndPointAction";
 static NSString *const CallKeepDidActivateAudioSession = @"CallKeepDidActivateAudioSession";
 static NSString *const CallKeepDidDeactivateAudioSession = @"CallKeepDidDeactivateAudioSession";
 static NSString *const CallKeepDidDisplayIncomingCall = @"CallKeepDidDisplayIncomingCall";
@@ -242,29 +243,36 @@ static CXProvider* sharedProvider;
             completion();
         }
         return;
+        
     }
+    
+    NSString *command = dic[@"command"];
+    
+    if([@"C100" isEqualToString:command]) {
+        NSString *uuid = dic[@"uuid"];
+        NSString *callerId = dic[@"caller"];
+        NSString *callerName = dic[@"caller_name"];
+    //    BOOL hasVideo = [dic[@"has_video"] boolValue];
+    //    NSString *callerIdType = dic[@"caller_id_type"];
+       
 
-    NSString *uuid = dic[@"uuid"];
-    NSString *callerId = dic[@"caller_id"];
-    NSString *callerName = dic[@"caller_name"];
-    BOOL hasVideo = [dic[@"has_video"] boolValue];
-    NSString *callerIdType = dic[@"caller_id_type"];
-   
+        if( uuid == nil) {
+            uuid = [self createUUID];
+        }
 
-    if( uuid == nil) {
-        uuid = [self createUUID];
+        //NSDictionary *extra = payload.dictionaryPayload[@"extra"];
+
+        [CallKeep reportNewIncomingCall:uuid
+                                 handle:callerId
+                             handleType:@"number"
+                               hasVideo:NO
+                    localizedCallerName:callerName
+                            fromPushKit:YES
+                                payload:dic
+                  withCompletionHandler:completion];
+    } else if([@"C200" isEqualToString:command]) {
+        [self endCallToEndPoint: dic[@"reason"]];
     }
-
-    //NSDictionary *extra = payload.dictionaryPayload[@"extra"];
-
-    [CallKeep reportNewIncomingCall:uuid
-                             handle:callerId
-                         handleType:callerIdType
-                           hasVideo:hasVideo
-                localizedCallerName:callerName
-                        fromPushKit:YES
-                            payload:dic
-              withCompletionHandler:completion];
 }
 
 - (void)pushRegistry:(PKPushRegistry *)registry didReceiveIncomingPushWithPayload:(PKPushPayload *)payload forType:(NSString *)type {
@@ -346,6 +354,20 @@ contactIdentifier:(NSString * _Nullable)contactIdentifier
         CXTransaction *transaction = [[CXTransaction alloc] initWithAction:endCallAction];
         [self requestTransaction:transaction];
     }
+}
+
+-(void) endCallToEndPoint: (NSString *) reason
+{
+    NSLog(@"[CallKeep][endCallToEndPoint]");
+
+    for (CXCall *call in self.callKeepCallController.callObserver.calls) {
+        NSLog(@"[CallKeep][endCallToEndPoint] + ended : %@", call.UUID);
+
+        [sharedProvider reportCallWithUUID:call.UUID endedAtDate:[NSDate date] reason:CXCallEndedReasonRemoteEnded];
+    }
+    [self sendEventWithNameWrapper:CallKeepDidEndedCallToEndPointAction body: @{@"reason": reason}];
+    
+
 }
 
 -(void) setOnHold:(NSString *)uuidString shouldHold:(BOOL)shouldHold
@@ -444,8 +466,8 @@ contactIdentifier:(NSString * _Nullable)contactIdentifier
                 callUpdate.remoteHandle = startCallAction.handle;
                 callUpdate.hasVideo = startCallAction.video;
                 callUpdate.localizedCallerName = startCallAction.contactIdentifier;
-                callUpdate.supportsDTMF = YES;
-                callUpdate.supportsHolding = YES;
+                callUpdate.supportsDTMF = NO;
+                callUpdate.supportsHolding = NO;
                 callUpdate.supportsGrouping = NO;
                 callUpdate.supportsUngrouping = NO;
                 [self.callKeepProvider reportCallWithUUID:startCallAction.callUUID updated:callUpdate];
@@ -524,8 +546,8 @@ contactIdentifier:(NSString * _Nullable)contactIdentifier
     NSUUID *uuid = [[NSUUID alloc] initWithUUIDString:uuidString];
     CXCallUpdate *callUpdate = [[CXCallUpdate alloc] init];
     callUpdate.remoteHandle = [[CXHandle alloc] initWithType:_handleType value:handle];
-    callUpdate.supportsDTMF = YES;
-    callUpdate.supportsHolding = YES;
+    callUpdate.supportsDTMF = NO;
+    callUpdate.supportsHolding = NO;
     callUpdate.supportsGrouping = NO;
     callUpdate.supportsUngrouping = NO;
     callUpdate.hasVideo = hasVideo;
@@ -640,7 +662,7 @@ contactIdentifier:(NSString * _Nullable)contactIdentifier
 #endif
     
     AVAudioSession* audioSession = [AVAudioSession sharedInstance];
-    [audioSession setCategory:AVAudioSessionCategoryPlayAndRecord withOptions:AVAudioSessionCategoryOptionAllowBluetooth error:nil];
+    [audioSession setCategory:AVAudioSessionCategoryPlayAndRecord withOptions:AVAudioSessionCategoryOptionAllowBluetooth | AVAudioSessionCategoryOptionAllowBluetoothA2DP  error:nil];
     
     [audioSession setMode:AVAudioSessionModeVoiceChat error:nil];
     
