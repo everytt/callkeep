@@ -90,6 +90,8 @@ public class IncomingCallActivity extends Activity implements VoiceConnection.Co
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Log.i(TAG, "onCreate ++");
+
         initWindowFlag();
 
         Intent intent = getIntent();
@@ -97,17 +99,26 @@ public class IncomingCallActivity extends Activity implements VoiceConnection.Co
         Log.i(TAG, "showing fullscreen answer ux for call id " + callId);
 
         boolean accepted = intent.getBooleanExtra(Constants.EXTRA_CALL_ACCEPTED, false);
-        HashMap<String, String> map = (HashMap) intent.getSerializableExtra(Constants.EXTRA_CALL_HANDLE);
+        String displayName;
+        String handle;
 
-        toast_no_pair_bluetooth = map.get(Constants.EXTRA_TOAST_NO_PAIR_BLUETOOTH);
-        String name = map.get(Constants.EXTRA_CALLER_NAME);
+        try {
+            HashMap<String, String> map = (HashMap) intent.getSerializableExtra(Constants.EXTRA_CALL_HANDLE);
 
-        String handle = map.get(Constants.EXTRA_CALL_NUMBER);
-        Uri uri = Uri.parse(handle);
-        handle  = uri.getSchemeSpecificPart();
+            toast_no_pair_bluetooth = map.get(Constants.EXTRA_TOAST_NO_PAIR_BLUETOOTH);
+            displayName = map.get(Constants.EXTRA_CALLER_NAME);
 
-        if(name == null || name.isEmpty()) {
-            name = handle;
+            handle = map.get(Constants.EXTRA_CALL_NUMBER);
+            Uri uri = Uri.parse(handle);
+            handle  = uri.getSchemeSpecificPart();
+
+            if(displayName == null || displayName.isEmpty()) {
+                displayName = handle;
+                handle = "";
+            }
+        } catch( Exception e) {
+            Log.i(TAG, "exception :::: " + e);
+            displayName = "0000";
             handle = "";
         }
 
@@ -121,7 +132,7 @@ public class IncomingCallActivity extends Activity implements VoiceConnection.Co
         mTextTimer = (TextView) findViewById(R.id.text_timer);
 
         TextView textName = (TextView) findViewById(R.id.text_name);
-        textName.setText(name);
+        textName.setText(displayName);
         TextView textNumber = (TextView) findViewById(R.id.text_phone_number);
         textNumber.setText(handle);
 
@@ -138,6 +149,9 @@ public class IncomingCallActivity extends Activity implements VoiceConnection.Co
 
         initAudioManager();
         switchCallingView(accepted);
+
+
+        Log.i(TAG, "onCreate --");
     }
 
     private void initWindowFlag() {
