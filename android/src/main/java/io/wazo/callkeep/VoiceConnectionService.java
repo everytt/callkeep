@@ -23,6 +23,7 @@ import android.app.ActivityManager.RunningTaskInfo;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -53,6 +54,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import io.wazo.callkeep.activity.IncomingCallActivity;
+import io.wazo.callkeep.activity.OutgoingCallActivity;
 import io.wazo.callkeep.utils.ConstraintsMap;
 import static io.wazo.callkeep.Constants.*;
 import static io.wazo.callkeep.Constants.FOREGROUND_SERVICE_TYPE_MICROPHONE;
@@ -182,7 +185,7 @@ public class VoiceConnectionService extends ConnectionService {
             displayServiceTitle  = uri.getSchemeSpecificPart();
         }
 
-        startForegroundService(displayServiceTitle);
+        startForegroundService(displayServiceTitle, true);
 
         // ‍️Weirdly on some Samsung phones (A50, S9...) using `setInitialized` will not display the native UI ...
         // when making a call from the native Phone application. The call will still be displayed correctly without it.
@@ -249,7 +252,7 @@ public class VoiceConnectionService extends ConnectionService {
         return outgoingCallConnection;
     }
 
-    public void startForegroundService(String endPoint) {
+    public void startForegroundService(String endPoint, boolean outgoing) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             // Foreground services not required before SDK 28
             return;
@@ -267,13 +270,15 @@ public class VoiceConnectionService extends ConnectionService {
         NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         assert manager != null;
         manager.createNotificationChannel(chan);
+        Intent intent = new Intent(getApplicationContext(), (outgoing ? OutgoingCallActivity.class : IncomingCallActivity.class));
+        PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
 
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, ONGOING_CHANNEL_ID);
         notificationBuilder.setOngoing(true)
                 .setContentTitle(endPoint)
                 .setContentText(notificationContent)
                 .setPriority(NotificationManager.IMPORTANCE_MIN)
-                .setCategory(Notification.CATEGORY_SERVICE);
+                .setCategory(Notification.CATEGORY_SERVICE).setContentIntent(pi);
 
         int resIcon = getApplicationInfo().icon;
         notificationBuilder.setSmallIcon(resIcon);

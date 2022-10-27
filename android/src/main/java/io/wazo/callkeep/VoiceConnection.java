@@ -303,7 +303,7 @@ public class VoiceConnection extends Connection {
 
             name = number;
         }
-        ((VoiceConnectionService) context).startForegroundService(name);
+        ((VoiceConnectionService) context).startForegroundService(name, false);
         setAudioModeIsVoip(true);
 
         sendCallRequestToActivity(ACTION_ANSWER_CALL, handle);
