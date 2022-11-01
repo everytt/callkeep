@@ -27,6 +27,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 
 import io.wazo.callkeep.Constants;
+import io.wazo.callkeep.MyService;
 import io.wazo.callkeep.R;
 import io.wazo.callkeep.VoiceConnection;
 import io.wazo.callkeep.VoiceConnectionService;
@@ -150,7 +151,9 @@ public class IncomingCallActivity extends Activity implements VoiceConnection.Co
         initAudioManager();
         switchCallingView(accepted);
 
-
+        Intent serviceIntent = new Intent(getBaseContext(), MyService.class);
+        serviceIntent.putExtra("callId", callId);
+        startService(serviceIntent);
         Log.i(TAG, "onCreate --");
     }
 
@@ -380,7 +383,7 @@ public class IncomingCallActivity extends Activity implements VoiceConnection.Co
             }
             mProximityWakeLock = null;
         }
-
+        stopService(new Intent(getBaseContext(), MyService.class));
         super.onDestroy();
 
     }

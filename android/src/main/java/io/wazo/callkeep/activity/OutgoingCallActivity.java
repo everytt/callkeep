@@ -2,6 +2,8 @@ package io.wazo.callkeep.activity;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.ActivityManager.AppTask;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
@@ -27,12 +29,13 @@ import java.util.Calendar;
 import java.util.HashMap;
 
 import io.wazo.callkeep.Constants;
+import io.wazo.callkeep.MyService;
 import io.wazo.callkeep.R;
 import io.wazo.callkeep.VoiceConnection;
 import io.wazo.callkeep.VoiceConnectionService;
 import io.wazo.callkeep.activity.listener.DebouncedOnClickListener;
 
-public class OutgoingCallActivity extends Activity implements VoiceConnection.ConnectionListener {
+public class OutgoingCallActivity extends Activity implements VoiceConnection.ConnectionListener{
     private final String TAG = "OutgoingCallActivity";
 
     private static final int REQUEST_PERMISSION = 19;
@@ -124,6 +127,10 @@ public class OutgoingCallActivity extends Activity implements VoiceConnection.Co
 
         mConnection.setListener(this);
         init(name, handle);
+
+        Intent serviceIntent = new Intent(getBaseContext(), MyService.class);
+        serviceIntent.putExtra("callId", callId);
+        startService(serviceIntent);
     }
 
     private void init(String name, String handle) {
@@ -133,7 +140,6 @@ public class OutgoingCallActivity extends Activity implements VoiceConnection.Co
             name = handle;
             handle = "";
         }
-
         mTextName = findViewById(R.id.text_name);
         mTextName.setText(name);
         mTextPhoneNumber = findViewById(R.id.text_phone_number);
@@ -156,6 +162,8 @@ public class OutgoingCallActivity extends Activity implements VoiceConnection.Co
 
         timeRunning = false;
     }
+
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -382,6 +390,8 @@ public class OutgoingCallActivity extends Activity implements VoiceConnection.Co
         finish();
     }
 
+
+
     @Override
     protected void onDestroy() {
         stopTimer();
@@ -392,6 +402,8 @@ public class OutgoingCallActivity extends Activity implements VoiceConnection.Co
             }
             mProximityWakeLock = null;
         }
+
+        stopService(new Intent(getBaseContext(), MyService.class));
 
         super.onDestroy();
     }

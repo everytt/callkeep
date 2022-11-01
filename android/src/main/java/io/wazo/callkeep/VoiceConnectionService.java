@@ -27,6 +27,7 @@ import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
@@ -96,7 +97,7 @@ public class VoiceConnectionService extends ConnectionService {
 
     public VoiceConnectionService() {
         super();
-        Log.e(TAG, "Constructor");
+        Log.e(TAG, "Constructor ::: HI");
         isReachable = false;
         isInitialized = false;
         isAvailable = false;
@@ -132,10 +133,26 @@ public class VoiceConnectionService extends ConnectionService {
         VoiceConnectionService.hasOutgoingCall = false;
         VoiceConnectionService.isCalling = false;
 
-        currentConnectionService.stopForegroundService();
+        currentConnectionService.stopForegroundService(false);
 
         if (currentConnections.containsKey(connectionId)) {
             currentConnections.remove(connectionId);
+        }
+    }
+
+    public static void deinitConnectionByCallId(int callId) {
+        Log.d(TAG, "deinitConnectionByCallId:" + callId);
+
+        VoiceConnectionService.hasOutgoingCall = false;
+        VoiceConnectionService.isCalling = false;
+
+        currentConnectionService.stopForegroundService(true);
+
+        for(VoiceConnection connection : currentConnections.values()) {
+            if (connection.getCallId() == callId) {
+                connection.onDisconnect();
+                currentConnections.remove(connection);
+            }
         }
     }
 
@@ -290,13 +307,17 @@ public class VoiceConnectionService extends ConnectionService {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    private void stopForegroundService() {
+    private void stopForegroundService(boolean force) {
         Log.d(TAG, "[VoiceConnectionService] stopForegroundService");
         if (_settings == null || !_settings.hasKey("foregroundService")) {
             Log.d(TAG, "[VoiceConnectionService] Discarding stop foreground service, no service configured");
             return;
         }
-        stopForeground(FOREGROUND_SERVICE_TYPE_MICROPHONE);
+        if( force ) {
+            stopForeground(true);
+        } else {
+            stopForeground(FOREGROUND_SERVICE_TYPE_MICROPHONE);
+        }
     }
 
     private void wakeUpApplication(String uuid, String number, String displayName) {
