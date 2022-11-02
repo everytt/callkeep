@@ -183,6 +183,7 @@ public class VoiceConnection extends Connection {
 
             builder.setStyle(new Notification.DecoratedCustomViewStyle());
             builder.setCustomContentView(notiView);
+            // D - HeadsUpContentView or BigContentView 설정 시 Noti 화면 내 확장버튼 출력되어 주석
             // builder.setCustomHeadsUpContentView(notiView);
             // builder.setCustomBigContentView(notiView);
         } else {

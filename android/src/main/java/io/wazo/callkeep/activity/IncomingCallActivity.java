@@ -7,13 +7,14 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
+import android.media.AudioDeviceInfo;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
+import android.telecom.CallAudioState;
 import android.telecom.DisconnectCause;
 import android.util.Log;
 import android.view.View;
@@ -34,7 +35,7 @@ import io.wazo.callkeep.VoiceConnectionService;
 import io.wazo.callkeep.activity.listener.DebouncedOnClickListener;
 
 public class IncomingCallActivity extends Activity implements VoiceConnection.ConnectionListener {
-    public static final String TAG = "IncomingCallActivity";
+    public static final String TAG = "[Flutter] IncomingCallActivity";
 
     private VoiceConnection mConnection;
     private AudioManager mAudioManager;
@@ -151,7 +152,7 @@ public class IncomingCallActivity extends Activity implements VoiceConnection.Co
         initAudioManager();
         switchCallingView(accepted);
 
-        Intent serviceIntent = new Intent(getBaseContext(), MyService.class);
+        Intent serviceIntent = new Intent(getApplicationContext(), MyService.class);
         serviceIntent.putExtra("callId", callId);
         startService(serviceIntent);
         Log.i(TAG, "onCreate --");
@@ -199,7 +200,7 @@ public class IncomingCallActivity extends Activity implements VoiceConnection.Co
 
     private void initAudioManager() {
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        mAudioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
 
         mAudioManager.requestAudioFocus(null, AudioManager.STREAM_VOICE_CALL, AudioManager.AUDIOFOCUS_GAIN);
         mAudioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
@@ -310,15 +311,23 @@ public class IncomingCallActivity extends Activity implements VoiceConnection.Co
     }
 
     private void changeToSpeakMode() {
+        Log.d(TAG, "changeToSpeakMode ++ ");
+
         if (mAudioManager != null) {
             if (mAudioManager.isSpeakerphoneOn()) {
-                mAudioManager.setSpeakerphoneOn(false);
-                mAudioManager.stopBluetoothSco();
-                mAudioManager.setBluetoothScoOn(false);
-
-                mBtnSpeak.setBackgroundResource(R.drawable.call_btn_call_speaker_off);
+                if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+                    mConnection.setAudioRoute(CallAudioState.ROUTE_EARPIECE);
+                else {
+                    mAudioManager.setSpeakerphoneOn(false);
+                    mAudioManager.stopBluetoothSco();
+                    mAudioManager.setBluetoothScoOn(false);
+                }
+                mBtnSpeak.setBackgroundResource(R.drawable.call_btn_call_speaker_off );
             } else {
-                mAudioManager.setSpeakerphoneOn(true);
+                if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+                    mConnection.setAudioRoute(CallAudioState.ROUTE_SPEAKER);
+                else
+                    mAudioManager.setSpeakerphoneOn(true);
                 mBtnSpeak.setBackgroundResource(R.drawable.call_btn_call_speaker_on);
             }
 
@@ -332,16 +341,22 @@ public class IncomingCallActivity extends Activity implements VoiceConnection.Co
         if (mAudioManager != null) {
             if (isBluetoothAvailable()) {
                 if (mAudioManager.isBluetoothScoOn()) {
-                    mAudioManager.setSpeakerphoneOn(false);
-                    mAudioManager.stopBluetoothSco();
-                    mAudioManager.setBluetoothScoOn(false);
-
+                    if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        mConnection.setAudioRoute(CallAudioState.ROUTE_EARPIECE);
+                    } else {
+                        mAudioManager.setSpeakerphoneOn(false);
+                        mAudioManager.stopBluetoothSco();
+                        mAudioManager.setBluetoothScoOn(false);
+                    }
                     mBtnBluetooth.setBackgroundResource(R.drawable.call_btn_bluetooth_off);
                 } else {
-                    mAudioManager.setSpeakerphoneOn(false);
-                    mAudioManager.startBluetoothSco();
-                    mAudioManager.setBluetoothScoOn(true);
-
+                    if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        mConnection.setAudioRoute(CallAudioState.ROUTE_BLUETOOTH);
+                    } else {
+                        mAudioManager.setSpeakerphoneOn(false);
+                        mAudioManager.startBluetoothSco();
+                        mAudioManager.setBluetoothScoOn(true);
+                    }
                     mBtnBluetooth.setBackgroundResource(R.drawable.call_btn_bluetooth_on);
                 }
             } else {
@@ -383,7 +398,7 @@ public class IncomingCallActivity extends Activity implements VoiceConnection.Co
             }
             mProximityWakeLock = null;
         }
-        stopService(new Intent(getBaseContext(), MyService.class));
+        stopService(new Intent(getApplicationContext(), MyService.class));
         super.onDestroy();
 
     }

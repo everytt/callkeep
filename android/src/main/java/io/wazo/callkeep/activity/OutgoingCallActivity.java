@@ -2,8 +2,6 @@ package io.wazo.callkeep.activity;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.ActivityManager.AppTask;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
@@ -15,6 +13,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
+import android.telecom.CallAudioState;
 import android.telecom.DisconnectCause;
 import android.util.Log;
 import android.view.View;
@@ -36,7 +35,7 @@ import io.wazo.callkeep.VoiceConnectionService;
 import io.wazo.callkeep.activity.listener.DebouncedOnClickListener;
 
 public class OutgoingCallActivity extends Activity implements VoiceConnection.ConnectionListener{
-    private final String TAG = "OutgoingCallActivity";
+    private final String TAG = "[Flutter] OutgoingCallActivity";
 
     private static final int REQUEST_PERMISSION = 19;
 
@@ -81,17 +80,14 @@ public class OutgoingCallActivity extends Activity implements VoiceConnection.Co
     @SuppressLint("DefaultLocale")
     private Runnable mTimerRunnable = new Runnable() {
         @Override
-        public void run() { // todo junseo2 여기가 시간을 보여주곳 같은데... 문제가 있나...
+        public void run() {
             long now = Calendar.getInstance().getTimeInMillis();
-            Log.d("junseo2", "start: "+mStartTime+", now: "+now);
 
             long time = (now - mStartTime) / 1000;
-            Log.d("junseo2", "time: "+time);
 
             long min = time / 60;
             long sec = time % 60;
             long hour = min / 60;
-
 
             String strTime = String.format("%02d : %02d : %02d", hour, min, sec);
             mTextTimer.setText(strTime);
@@ -207,9 +203,11 @@ public class OutgoingCallActivity extends Activity implements VoiceConnection.Co
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+                mProximityWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, getLocalClassName());
             }
         }
     }
+
 
     private void initAudioManager() {
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -284,15 +282,23 @@ public class OutgoingCallActivity extends Activity implements VoiceConnection.Co
     }
 
     private void changeToSpeakMode() {
+        Log.d(TAG, "changeToSpeakMode ++ ");
+
         if (mAudioManager != null) {
             if (mAudioManager.isSpeakerphoneOn()) {
-                mAudioManager.setSpeakerphoneOn(false);
-                mAudioManager.stopBluetoothSco();
-                mAudioManager.setBluetoothScoOn(false);
-
-                mBtnSpeak.setBackgroundResource(R.drawable.call_btn_call_speaker_off);
+                if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+                    mConnection.setAudioRoute(CallAudioState.ROUTE_EARPIECE);
+                else {
+                    mAudioManager.setSpeakerphoneOn(false);
+                    mAudioManager.stopBluetoothSco();
+                    mAudioManager.setBluetoothScoOn(false);
+                }
+                mBtnSpeak.setBackgroundResource(R.drawable.call_btn_call_speaker_off );
             } else {
-                mAudioManager.setSpeakerphoneOn(true);
+                if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+                    mConnection.setAudioRoute(CallAudioState.ROUTE_SPEAKER);
+                else
+                    mAudioManager.setSpeakerphoneOn(true);
                 mBtnSpeak.setBackgroundResource(R.drawable.call_btn_call_speaker_on);
             }
 
@@ -306,16 +312,22 @@ public class OutgoingCallActivity extends Activity implements VoiceConnection.Co
         if (mAudioManager != null) {
             if (isBluetoothAvailable()) {
                 if (mAudioManager.isBluetoothScoOn()) {
-                    mAudioManager.setSpeakerphoneOn(false);
-                    mAudioManager.stopBluetoothSco();
-                    mAudioManager.setBluetoothScoOn(false);
-
+                    if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        mConnection.setAudioRoute(CallAudioState.ROUTE_EARPIECE);
+                    } else {
+                        mAudioManager.setSpeakerphoneOn(false);
+                        mAudioManager.stopBluetoothSco();
+                        mAudioManager.setBluetoothScoOn(false);
+                    }
                     mBtnBluetooth.setBackgroundResource(R.drawable.call_btn_bluetooth_off);
                 } else {
-                    mAudioManager.setSpeakerphoneOn(false);
-                    mAudioManager.startBluetoothSco();
-                    mAudioManager.setBluetoothScoOn(true);
-
+                    if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        mConnection.setAudioRoute(CallAudioState.ROUTE_BLUETOOTH);
+                    } else {
+                        mAudioManager.setSpeakerphoneOn(false);
+                        mAudioManager.startBluetoothSco();
+                        mAudioManager.setBluetoothScoOn(true);
+                    }
                     mBtnBluetooth.setBackgroundResource(R.drawable.call_btn_bluetooth_on);
                 }
             } else {
