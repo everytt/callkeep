@@ -331,6 +331,10 @@ public class OutgoingCallActivity extends Activity implements VoiceConnection.Co
 
     private void switchCallingView(boolean hasToSwitch) {
         if (hasToSwitch) {
+            if (mProximityWakeLock != null) {
+                mProximityWakeLock.acquire();
+            }
+
             mContainerCallingBtn.setVisibility(View.VISIBLE);
             mTextName.setVisibility(View.VISIBLE);
             mTextPhoneNumber.setVisibility(View.VISIBLE);
