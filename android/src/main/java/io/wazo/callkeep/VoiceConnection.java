@@ -34,6 +34,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.telecom.CallAudioState;
 import android.telecom.Connection;
 import android.telecom.DisconnectCause;
@@ -63,7 +64,14 @@ public class VoiceConnection extends Connection {
 
     private static int sNextCallId = 1;
 
+    public enum AudioState {
+        EARPEICE,
+        SPEAKER,
+        BLUETOOTH
+    }
+
     private boolean isMuted = false;
+    private AudioState audioState = AudioState.EARPEICE;
     private HashMap<String, String> handle;
     private Context context;
     private final boolean mIsIncomingCall;
@@ -75,6 +83,7 @@ public class VoiceConnection extends Connection {
     public interface ConnectionListener {
         void onActive();
         void onDisconnected();
+        void onAudioStateChanged(AudioState state);
     }
 
     private ConnectionListener mListener;
@@ -251,6 +260,7 @@ public class VoiceConnection extends Connection {
         }
     }
 
+
     @Override
     public void onStateChanged(int state) {
         Log.d(TAG, "onStateChanged : " + state);
@@ -270,13 +280,23 @@ public class VoiceConnection extends Connection {
 
     @Override
     public void onCallAudioStateChanged(CallAudioState state) {
-        if (state.isMuted() == this.isMuted) {
+        Log.d(TAG, "onCallAudioStateChanged : " + state);
+
+        if (state.isMuted() == this.isMuted && state.getRoute() == this.audioState.ordinal()) {
             return;
+        }else if(state.getRoute() == CallAudioState.ROUTE_SPEAKER) {
+            if( mListener != null ) mListener.onAudioStateChanged(AudioState.SPEAKER);
+        } else if(state.getRoute() == CallAudioState.ROUTE_EARPIECE) {
+            if( mListener != null ) mListener.onAudioStateChanged(AudioState.EARPEICE);
+        } else if(state.getRoute() == CallAudioState.ROUTE_BLUETOOTH) {
+            if( mListener != null ) mListener.onAudioStateChanged(AudioState.BLUETOOTH);
         }
+
 
         this.isMuted = state.isMuted();
         sendCallRequestToActivity(isMuted ? ACTION_MUTE_CALL : ACTION_UNMUTE_CALL, handle);
     }
+
 
     @Override
     public void onAnswer() {
