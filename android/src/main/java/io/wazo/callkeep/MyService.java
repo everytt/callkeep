@@ -9,6 +9,7 @@ import android.util.Log;
 public class MyService extends Service {
     private static String TAG = "[Flutter] RNCK:MyService";
     private int callId;
+    private boolean isDestroyed = false;
 
     public MyService() {
     }
@@ -31,16 +32,17 @@ public class MyService extends Service {
 
     @Override
     public void onTaskRemoved(Intent rootIntent) {
-        super.onTaskRemoved(rootIntent);
         Log.i(TAG, "onTaskRemoved ++ "+ callId);
         VoiceConnectionService.deinitConnectionByCallId(callId);
+        isDestroyed = true;
 
-
+        super.onTaskRemoved(rootIntent);
     }
 
     @Override
     public void onDestroy() {
         Log.i(TAG, "onDestroy ++");
+        if( !isDestroyed) VoiceConnectionService.deinitConnectionByCallId(callId);
         super.onDestroy();
     }
 }
