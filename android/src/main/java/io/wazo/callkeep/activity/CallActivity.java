@@ -150,19 +150,19 @@ public class CallActivity extends Activity {
 
         if (mAudioManager != null) {
             if (mAudioManager.isSpeakerphoneOn()) {
-                if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+//                if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
                     mConnection.setAudioRoute(CallAudioState.ROUTE_EARPIECE);
-                else {
-                    mAudioManager.setSpeakerphoneOn(false);
-                    mAudioManager.stopBluetoothSco();
-                    mAudioManager.setBluetoothScoOn(false);
-                }
+//                else {
+//                    mAudioManager.setSpeakerphoneOn(false);
+//                    mAudioManager.stopBluetoothSco();
+//                    mAudioManager.setBluetoothScoOn(false);
+//                }
 //                mBtnSpeak.setBackgroundResource(R.drawable.call_btn_call_speaker_off );
             } else {
-                if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+//                if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
                     mConnection.setAudioRoute(CallAudioState.ROUTE_SPEAKER);
-                else
-                    mAudioManager.setSpeakerphoneOn(true);
+//                else
+//                    mAudioManager.setSpeakerphoneOn(true);
 //                mBtnSpeak.setBackgroundResource(R.drawable.call_btn_call_speaker_on);
             }
 
@@ -210,22 +210,22 @@ public class CallActivity extends Activity {
         if (mAudioManager != null) {
             if (isBluetoothAvailable()) {
                 if (audioState == VoiceConnection.AudioState.BLUETOOTH) {
-                    if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+//                    if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                         mConnection.setAudioRoute(CallAudioState.ROUTE_EARPIECE);
-                    } else {
-                        mAudioManager.setSpeakerphoneOn(false);
-                        mAudioManager.stopBluetoothSco();
-                        mAudioManager.setBluetoothScoOn(false);
-                    }
+//                    } else {
+//                        mAudioManager.setSpeakerphoneOn(false);
+//                        mAudioManager.stopBluetoothSco();
+//                        mAudioManager.setBluetoothScoOn(false);
+//                    }
 //                    mBtnBluetooth.setBackgroundResource(R.drawable.btn_bluetooth_off);
                 } else {
-                    if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+//                    if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                         mConnection.setAudioRoute(CallAudioState.ROUTE_BLUETOOTH);
-                    } else {
-                        mAudioManager.setSpeakerphoneOn(false);
-                        mAudioManager.startBluetoothSco();
-                        mAudioManager.setBluetoothScoOn(true);
-                    }
+//                    } else {
+//                        mAudioManager.setSpeakerphoneOn(false);
+//                        mAudioManager.startBluetoothSco();
+//                        mAudioManager.setBluetoothScoOn(true);
+//                    }
 //                    mBtnBluetooth.setBackgroundResource(R.drawable.btn_bluetooth_on);
                 }
             } else {

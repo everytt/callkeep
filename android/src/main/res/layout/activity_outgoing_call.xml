@@ -111,17 +111,16 @@
             android:layout_height="0dp"
             android:layout_weight="1" />
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/height_calling_area"
-            android:layout_marginTop="@dimen/base_margin_x3">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/container_calling"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
+                android:layout_marginTop="@dimen/base_margin_x3"
+                android:layout_height="@dimen/height_calling_area"
                 android:orientation="horizontal"
+                android:layout_gravity="bottom"
+                android:layout_marginBottom="@dimen/base_margin_x6"
+                android:elevation="@dimen/base_margin_x6"
                 android:visibility="gone">
 
                 <Button
@@ -148,7 +147,7 @@
                     android:id="@+id/btn_blue_tooth"
                     android:layout_width="@dimen/callscreen_sub_button_size"
                     android:layout_height="@dimen/callscreen_sub_button_size"
-                    android:background="@drawable/btn_call_bluetooth"
+                    android:background="@drawable/call_btn_bluetooth_off"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintLeft_toRightOf="@id/btn_cancel_calling"
                     app:layout_constraintRight_toRightOf="parent"
@@ -169,6 +168,5 @@
                     android:layout_height="@dimen/callscreen_main_button_size"
                     android:background="@drawable/btn_call_cancel" />
             </LinearLayout>
-        </FrameLayout>
     </LinearLayout>
 </FrameLayout>

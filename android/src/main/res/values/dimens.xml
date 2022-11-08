@@ -35,8 +35,8 @@
     <dimen name="size_text_name">25dp</dimen>
     <dimen name="size_text_handle">14dp</dimen>
 
-    <dimen name="callscreen_sub_button_size">63dp</dimen>
-    <dimen name="callscreen_main_button_size">73dp</dimen>
+    <dimen name="callscreen_sub_button_size">64dp</dimen>
+    <dimen name="callscreen_main_button_size">80dp</dimen>
 
     <dimen name="call_panel_height">85dp</dimen>
     <dimen name="call_panel_button_size">77dp</dimen>

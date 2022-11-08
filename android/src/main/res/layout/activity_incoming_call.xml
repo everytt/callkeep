@@ -38,7 +38,7 @@
             android:id="@+id/text_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/base_margin_x5"
+            android:layout_marginTop="23dp"
             android:gravity="center"
             android:textColor="@color/highlight"
             android:textSize="@dimen/size_text_name"
@@ -73,7 +73,7 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="@dimen/base_margin_x5">
+            android:layout_marginTop="@dimen/base_margin_x3">
 
             <RelativeLayout
                 android:id="@+id/container_waiting"
@@ -100,6 +100,8 @@
                     android:layout_height="@dimen/height_calling_area"
                     android:orientation="horizontal"
                     android:layout_gravity="bottom"
+                    android:layout_marginBottom="@dimen/base_margin_x6"
+                    android:elevation="@dimen/base_margin_x6"
                     android:visibility="gone">
                     <Button
                         android:id="@+id/btn_speak"
@@ -123,7 +125,7 @@
                         android:id="@+id/btn_blue_tooth"
                         android:layout_width="@dimen/callscreen_sub_button_size"
                         android:layout_height="@dimen/callscreen_sub_button_size"
-                        android:background="@drawable/btn_call_bluetooth"
+                        android:background="@drawable/call_btn_bluetooth_off"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintLeft_toRightOf="@id/btn_cancel_calling"
