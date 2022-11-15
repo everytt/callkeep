@@ -97,7 +97,6 @@ public class VoiceConnectionService extends ConnectionService {
 
     public VoiceConnectionService() {
         super();
-        Log.e(TAG, "Constructor ::: HI");
         isReachable = false;
         isInitialized = false;
         isAvailable = false;

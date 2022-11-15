@@ -1,33 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/bg_calling"
     tools:context="io.wazo.callkeep.activity.OutgoingCallActivity">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/bg_calling"
-        android:gravity="center"
-        android:orientation="vertical">
 
         <TextView
             android:id="@+id/call_card"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/base_margin_x8"
+            android:layout_marginTop="@dimen/base_margin_x5"
             android:background="@drawable/bg_white_card"
             android:gravity="center"
-            android:paddingBottom="@dimen/padding_rounded_card_vertical"
-            android:paddingLeft="@dimen/padding_rounded_card_horizontal"
-            android:paddingRight="@dimen/padding_rounded_card_horizontal"
-            android:paddingTop="@dimen/padding_rounded_card_vertical"
+            android:paddingVertical="@dimen/padding_rounded_card_vertical"
+            android:paddingHorizontal="@dimen/padding_rounded_card_horizontal"
             android:text="@string/outgoing_title_card_text"
             android:textColor="@color/highlight"
             android:textSize="@dimen/size_text_incoming_call_card"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <TextView
+            android:id="@+id/text_name"
+            android:layout_marginTop="@dimen/callscreen_card_bottom_margin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textColor="@color/highlight"
+            android:textSize="@dimen/size_text_name"
+            android:text="Hong Eun-ae"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/call_card"/>
+
+        <include
+            android:id="@+id/keypad_view"
+            layout="@layout/keypad"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/base_margin_x2"
+            android:layout_marginBottom="@dimen/base_margin_x3"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/container_calling"/>
+
+    <LinearLayout
+        android:id="@+id/icon_area"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_name">
+
+            <TextView
+                android:id="@+id/text_waiting_big_msg"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/outgoing_title_text"
+                android:textColor="@color/highlight"
+                android:textSize="@dimen/size_title_message"
+                android:visibility="visible"
+                android:layout_marginTop="@dimen/base_margin_x4"
+                app:layout_constraintTop_toBottomOf="@+id/text_name"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/text_phone_number"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="@color/sub_color"
+                android:text="01050316305"
+                app:layout_constraintTop_toBottomOf="@+id/text_waiting_big_msg"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:textSize="@dimen/size_text_handle" />
 
         <ImageView
             android:layout_width="130dp"
@@ -39,46 +99,7 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="23dp">
-
-            <TextView
-                android:id="@+id/text_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textColor="#FF0855b1"
-                android:textSize="@dimen/size_text_name"
-                android:textStyle="bold" />
-        </FrameLayout>
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_text_top">
-
-            <TextView
-                android:id="@+id/text_waiting_big_msg"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="@string/outgoing_title_text"
-                android:textColor="@color/highlight"
-                android:textSize="@dimen/size_title_message"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/text_phone_number"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textColor="@color/sub_color"
-                android:textSize="@dimen/size_text_handle" />
-        </FrameLayout>
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/base_margin_x3">
+            android:layout_marginTop="@dimen/margin_ttgo_big_icon">
 
             <TextView
                 android:id="@+id/text_waiting_message"
@@ -87,7 +108,8 @@
                 android:gravity="center"
                 android:text="@string/tcp_text2"
                 android:textColor="@color/sub_color"
-                android:textSize="@dimen/size_content_message" />
+                android:textSize="@dimen/size_content_message"
+                android:visibility="visible" />
 
             <TextView
                 android:id="@+id/text_timer"
@@ -100,28 +122,27 @@
                 android:paddingTop="@dimen/padding_rounded_card_vertical"
                 android:paddingRight="@dimen/padding_rounded_card_horizontal"
                 android:paddingBottom="@dimen/padding_rounded_card_vertical"
+                android:text="00 : 00 : 00"
                 android:textColor="@color/white"
                 android:textSize="@dimen/size_text_timer"
                 android:textStyle="bold"
-                android:visibility="gone" />
+                android:visibility="visible" />
         </FrameLayout>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
+    </LinearLayout>
 
-
-            <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/container_calling"
                 android:layout_width="match_parent"
                 android:layout_marginTop="@dimen/base_margin_x3"
                 android:layout_height="@dimen/height_calling_area"
                 android:orientation="horizontal"
                 android:layout_gravity="bottom"
-                android:layout_marginBottom="@dimen/base_margin_x6"
-                android:elevation="@dimen/base_margin_x6"
-                android:visibility="gone">
+                android:layout_marginBottom="@dimen/base_margin_x4"
+                android:visibility="visible"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent">
 
                 <Button
                     android:id="@+id/btn_speak"
@@ -130,16 +151,6 @@
                     android:background="@drawable/call_btn_call_speaker_off"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toLeftOf="@id/btn_cancel_calling"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <Button
-                    android:id="@+id/btn_cancel_calling"
-                    android:layout_width="@dimen/callscreen_main_button_size"
-                    android:layout_height="@dimen/callscreen_main_button_size"
-                    android:background="@drawable/btn_call_cancel"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintLeft_toRightOf="@id/btn_speak"
                     app:layout_constraintRight_toLeftOf="@id/btn_blue_tooth"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -149,6 +160,26 @@
                     android:layout_height="@dimen/callscreen_sub_button_size"
                     android:background="@drawable/call_btn_bluetooth_off"
                     app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toRightOf="@id/btn_speak"
+                    app:layout_constraintRight_toLeftOf="@id/btn_cancel_calling"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <Button
+                    android:id="@+id/btn_cancel_calling"
+                    android:layout_width="@dimen/callscreen_main_button_size"
+                    android:layout_height="@dimen/callscreen_main_button_size"
+                    android:background="@drawable/btn_call_cancel"
+                    app:layout_constraintRight_toLeftOf="@id/btn_keypad"
+                    app:layout_constraintLeft_toRightOf="@id/btn_blue_tooth"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <Button
+                    android:id="@+id/btn_keypad"
+                    android:layout_width="@dimen/callscreen_sub_button_size"
+                    android:layout_height="@dimen/callscreen_sub_button_size"
+                    android:background="@drawable/call_btn_call_keypad_off"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintLeft_toRightOf="@id/btn_cancel_calling"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -156,10 +187,14 @@
 
             <LinearLayout
                 android:id="@+id/container_waiting"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="vertical"
+                android:layout_marginBottom="@dimen/base_margin_x4"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
                 android:visibility="gone">
 
                 <Button
@@ -168,5 +203,4 @@
                     android:layout_height="@dimen/callscreen_main_button_size"
                     android:background="@drawable/btn_call_cancel" />
             </LinearLayout>
-    </LinearLayout>
-</FrameLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>

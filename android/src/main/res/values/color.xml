@@ -11,4 +11,7 @@
     <color name="decline_ripple">#FB8D85</color>
     <color name="action_color">#4CAF50</color>
 
+    <color name="numberpad_text_color">#FFFFFF</color>
+    <color name="numberpad_color">#38FFFFFF</color>
+
 </resources>

@@ -1,11 +1,13 @@
 package io.wazo.callkeep.activity;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -14,6 +16,7 @@ import android.os.PowerManager;
 import android.telecom.CallAudioState;
 import android.telecom.Connection;
 import android.util.Log;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -21,12 +24,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 
 import java.util.Calendar;
 
 import io.wazo.callkeep.R;
 import io.wazo.callkeep.MyService;
 import io.wazo.callkeep.VoiceConnection;
+import io.wazo.callkeep.activity.listener.DebouncedOnClickListener;
 
 public class CallActivity extends Activity {
     public static final String TAG = "[Flutter] CallActivity";
@@ -39,10 +44,20 @@ public class CallActivity extends Activity {
 
     public VoiceConnection mConnection;
 
+    public TextView mTextName;
+    public TextView mTextPhoneNumber;
     public TextView mTextTimer;
+
     public Button mBtnSpeak;
     public Button mBtnBluetooth;
+    public Button mBtnKeyPad;
+
+    public View mContainerCallInfo;
+    public View mKeyPadView;
+
     public String toast_no_pair_bluetooth;
+    public String mProductName = "";
+    public String mKeyPadValues = "";
 
     private VoiceConnection.AudioState audioState = VoiceConnection.AudioState.EARPEICE;
 
@@ -60,7 +75,7 @@ public class CallActivity extends Activity {
             long hour = min / 60;
 
             String strTime = String.format("%02d : %02d : %02d", hour, min, sec);
-            if(mTextTimer != null) mTextTimer.setText(strTime);
+            if (mTextTimer != null) mTextTimer.setText(strTime);
 
             mHandler.postDelayed(mTimerRunnable, 1000L);
         }
@@ -77,7 +92,7 @@ public class CallActivity extends Activity {
         initAudioManager();
     }
 
-    public void startDestroyCaptureService(int callId){
+    public void startDestroyCaptureService(int callId) {
         Intent serviceIntent = new Intent(getBaseContext(), MyService.class);
         serviceIntent.putExtra("callId", callId);
         startService(serviceIntent);
@@ -150,20 +165,21 @@ public class CallActivity extends Activity {
 
         if (mAudioManager != null) {
             if (mAudioManager.isSpeakerphoneOn()) {
-//                if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     mConnection.setAudioRoute(CallAudioState.ROUTE_EARPIECE);
-//                else {
-//                    mAudioManager.setSpeakerphoneOn(false);
-//                    mAudioManager.stopBluetoothSco();
-//                    mAudioManager.setBluetoothScoOn(false);
-//                }
-//                mBtnSpeak.setBackgroundResource(R.drawable.call_btn_call_speaker_off );
+                } else {
+                    mAudioManager.setSpeakerphoneOn(false);
+                    mAudioManager.stopBluetoothSco();
+                    mAudioManager.setBluetoothScoOn(false);
+                    mBtnSpeak.setBackgroundResource(R.drawable.call_btn_call_speaker_off);
+                }
             } else {
-//                if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     mConnection.setAudioRoute(CallAudioState.ROUTE_SPEAKER);
-//                else
-//                    mAudioManager.setSpeakerphoneOn(true);
-//                mBtnSpeak.setBackgroundResource(R.drawable.call_btn_call_speaker_on);
+                } else {
+                    mAudioManager.setSpeakerphoneOn(true);
+                    mBtnSpeak.setBackgroundResource(R.drawable.call_btn_call_speaker_on);
+                }
             }
 
             applyBluetoothStatusUI();
@@ -172,13 +188,21 @@ public class CallActivity extends Activity {
 
     public void applyBluetoothStatusUI() {
         if (isBluetoothAvailable()) {
-            mBtnBluetooth.setBackgroundResource(audioState == VoiceConnection.AudioState.BLUETOOTH ?
-                    R.drawable.btn_bluetooth_on :
-                    R.drawable.call_btn_bluetooth_off);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                mBtnBluetooth.setBackgroundResource(audioState == VoiceConnection.AudioState.BLUETOOTH ?
+                        R.drawable.btn_bluetooth_on :
+                        R.drawable.call_btn_bluetooth_off);
+            } else {
+                mBtnSpeak.setBackgroundResource(isBluetoothScoOn() ?
+                        R.drawable.btn_bluetooth_on :
+                        R.drawable.call_btn_bluetooth_off);
+            }
         } else {
             mBtnBluetooth.setBackgroundResource(R.drawable.call_btn_bluetooth_off);
         }
+
     }
+
     public boolean isBluetoothScoOn() {
         boolean isOn = mAudioManager.isBluetoothScoOn();
         Log.i(TAG, "isBluetoothScoOn : " + (isOn ? "ON" : "OFF"));
@@ -191,9 +215,19 @@ public class CallActivity extends Activity {
         return isOn;
     }
 
-
     public boolean isBluetoothAvailable() {
         if (mAudioManager != null) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return false;
+            }
+
             if (mBluetoothAdapter != null &&
                     mBluetoothAdapter.isEnabled() &&
                     mBluetoothAdapter.getProfileConnectionState(BluetoothProfile.HEADSET) == BluetoothProfile.STATE_CONNECTED &&
@@ -210,31 +244,31 @@ public class CallActivity extends Activity {
         if (mAudioManager != null) {
             if (isBluetoothAvailable()) {
                 if (audioState == VoiceConnection.AudioState.BLUETOOTH) {
-//                    if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         mConnection.setAudioRoute(CallAudioState.ROUTE_EARPIECE);
-//                    } else {
-//                        mAudioManager.setSpeakerphoneOn(false);
-//                        mAudioManager.stopBluetoothSco();
-//                        mAudioManager.setBluetoothScoOn(false);
-//                    }
-//                    mBtnBluetooth.setBackgroundResource(R.drawable.btn_bluetooth_off);
+                    } else {
+                        mAudioManager.setSpeakerphoneOn(false);
+                        mAudioManager.stopBluetoothSco();
+                        mAudioManager.setBluetoothScoOn(false);
+                        mBtnBluetooth.setBackgroundResource(R.drawable.btn_bluetooth_off);
+                    }
                 } else {
-//                    if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         mConnection.setAudioRoute(CallAudioState.ROUTE_BLUETOOTH);
-//                    } else {
-//                        mAudioManager.setSpeakerphoneOn(false);
-//                        mAudioManager.startBluetoothSco();
-//                        mAudioManager.setBluetoothScoOn(true);
-//                    }
-//                    mBtnBluetooth.setBackgroundResource(R.drawable.btn_bluetooth_on);
+                    } else {
+                        mAudioManager.setSpeakerphoneOn(false);
+                        mAudioManager.startBluetoothSco();
+                        mAudioManager.setBluetoothScoOn(true);
+                        mBtnBluetooth.setBackgroundResource(R.drawable.btn_bluetooth_on);
+                    }
                 }
             } else {
                 Toast.makeText(getApplicationContext(), toast_no_pair_bluetooth, Toast.LENGTH_SHORT).show();
             }
-
-//            mBtnSpeak.setBackgroundResource(isSpeakerphoneOn() ?
-//                    R.drawable.call_btn_call_speaker_on :
-//                    R.drawable.call_btn_call_speaker_off);
+            if( Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
+                mBtnSpeak.setBackgroundResource(isSpeakerphoneOn() ?
+                        R.drawable.call_btn_call_speaker_on :
+                        R.drawable.call_btn_call_speaker_off);
         }
         Log.i(TAG, "changeToBluetooth --");
 
@@ -244,6 +278,45 @@ public class CallActivity extends Activity {
         if (mProximityWakeLock != null) {
             mProximityWakeLock.acquire();
         }
+    }
+
+
+    public void initKeyPadView(View keyPadView) {
+        keyPadView.findViewById(R.id.pin_code_button_1).setOnClickListener(view -> inputKeyPad('1'));
+        keyPadView.findViewById(R.id.pin_code_button_2).setOnClickListener(view -> inputKeyPad('2'));
+        keyPadView.findViewById(R.id.pin_code_button_3).setOnClickListener(view -> inputKeyPad('3'));
+        keyPadView.findViewById(R.id.pin_code_button_4).setOnClickListener(view -> inputKeyPad('4'));
+        keyPadView.findViewById(R.id.pin_code_button_5).setOnClickListener(view -> inputKeyPad('5'));
+        keyPadView.findViewById(R.id.pin_code_button_6).setOnClickListener(view -> inputKeyPad('6'));
+        keyPadView.findViewById(R.id.pin_code_button_7).setOnClickListener(view -> inputKeyPad('7'));
+        keyPadView.findViewById(R.id.pin_code_button_8).setOnClickListener(view -> inputKeyPad('8'));
+        keyPadView.findViewById(R.id.pin_code_button_9).setOnClickListener(view -> inputKeyPad('9'));
+        keyPadView.findViewById(R.id.pin_code_button_0).setOnClickListener(view -> inputKeyPad('0'));
+        keyPadView.findViewById(R.id.pin_code_button_a).setOnClickListener(view -> inputKeyPad('*'));
+        keyPadView.findViewById(R.id.pin_code_button_p).setOnClickListener(view -> inputKeyPad('#'));
+    }
+
+    public void changeKeyPadButton() {
+        if( mKeyPadView.getVisibility() == View.VISIBLE ) {
+            mBtnKeyPad.setBackgroundResource(R.drawable.call_btn_call_keypad_off);
+            mContainerCallInfo.setVisibility(View.VISIBLE);
+            mKeyPadView.setVisibility(View.GONE);
+
+            mKeyPadValues = "";
+            mTextName.setText(mProductName);
+        } else {
+            mBtnKeyPad.setBackgroundResource(R.drawable.call_btn_call_keypad_on);
+            mContainerCallInfo.setVisibility(View.GONE);
+            mKeyPadView.setVisibility(View.VISIBLE);
+        }
+    }
+
+
+    private void inputKeyPad(char value) {
+        Log.e(TAG, "inputKeyPad :: " + value);
+        mKeyPadValues += value;
+        mTextName.setText(mKeyPadValues);
+        mConnection.onPlayDtmfTone(value);
     }
 
     @Override
@@ -272,10 +345,10 @@ public class CallActivity extends Activity {
     public void onAudioStateChanged(VoiceConnection.AudioState state) {
         Log.i(TAG, "onAudioStateChanged : " + state.name());
         audioState = state;
-        if(state == VoiceConnection.AudioState.EARPEICE){
+        if(state == VoiceConnection.AudioState.EARPEICE) {
             mBtnSpeak.setBackgroundResource(R.drawable.call_btn_call_speaker_off);
             mBtnBluetooth.setBackgroundResource(isBluetoothAvailable() ? R.drawable.btn_bluetooth_off : R.drawable.call_btn_bluetooth_off);
-        }else if( state == VoiceConnection.AudioState.SPEAKER) {
+        } else if( state == VoiceConnection.AudioState.SPEAKER) {
             mBtnSpeak.setBackgroundResource(R.drawable.call_btn_call_speaker_on);
             mBtnBluetooth.setBackgroundResource(isBluetoothAvailable() ? R.drawable.btn_bluetooth_off : R.drawable.call_btn_bluetooth_off);
         } else if( state == VoiceConnection.AudioState.BLUETOOTH) {

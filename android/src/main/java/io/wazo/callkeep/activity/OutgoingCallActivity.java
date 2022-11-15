@@ -26,18 +26,11 @@ public class OutgoingCallActivity extends CallActivity implements VoiceConnectio
 
     private static final int REQUEST_PERMISSION = 19;
 
-    private String mProductName = "";
-
-    private TextView mTextName;
-    private TextView mTextPhoneNumber;
-
     private View mTextWaitingBigMsg;
     private View mTextWaitingMsg;
 
     private View mContainerCallingBtn;
     private View mContainerWaitingBtn;
-
-    private String mPhoneNumber;
 
     public static Intent getOutgoingCallIntent(Context context, int callId, HashMap handle) {
         Log.d("OUTGOINGCALL", "getOutgoingCallIntent : $handle");
@@ -81,9 +74,10 @@ public class OutgoingCallActivity extends CallActivity implements VoiceConnectio
     private void init(String name, String handle) {
         if(name == null || name.isEmpty()) {
             name = handle;
-            handle = "";
+            handle = "10078";
         }
         mTextName = findViewById(R.id.text_name);
+        mProductName = name;
         mTextName.setText(name);
         mTextPhoneNumber = findViewById(R.id.text_phone_number);
         mTextPhoneNumber.setText(handle);
@@ -95,8 +89,15 @@ public class OutgoingCallActivity extends CallActivity implements VoiceConnectio
 
         mContainerCallingBtn = findViewById(R.id.container_calling);
         mContainerWaitingBtn = findViewById(R.id.container_waiting);
+
         mBtnSpeak = findViewById(R.id.btn_speak);
         mBtnBluetooth = findViewById(R.id.btn_blue_tooth);
+        mBtnKeyPad = findViewById(R.id.btn_keypad);
+
+        mContainerCallInfo = findViewById(R.id.icon_area);
+
+        mKeyPadView = findViewById(R.id.keypad_view);
+        initKeyPadView(mKeyPadView);
 
         switchCallingView(false);
 
@@ -120,14 +121,8 @@ public class OutgoingCallActivity extends CallActivity implements VoiceConnectio
         }
     }
 
-
     private void initListener() {
-        mBtnSpeak.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                changeToSpeakMode();
-            }
-        });
+        mBtnSpeak.setOnClickListener(view -> changeToSpeakMode());
 
         findViewById(R.id.btn_cancel_calling).setOnClickListener(new DebouncedOnClickListener() {
             @Override
@@ -157,6 +152,13 @@ public class OutgoingCallActivity extends CallActivity implements VoiceConnectio
                 } else {
                     Toast.makeText(getApplicationContext(), toast_no_pair_bluetooth, Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+
+        mBtnKeyPad.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeKeyPadButton();
             }
         });
     }

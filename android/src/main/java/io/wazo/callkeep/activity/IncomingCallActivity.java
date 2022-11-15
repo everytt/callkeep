@@ -30,6 +30,7 @@ public class IncomingCallActivity extends CallActivity implements VoiceConnectio
     private View mContainerCallingBtn;
     private View mContainerWaitingBtn;
 
+
     public static Intent getIncomingCallIntent(Context context, int callId, boolean accepted, HashMap map) {
         Intent intent = new Intent(Intent.ACTION_MAIN, null);
         intent.setFlags(Intent.FLAG_ACTIVITY_NO_USER_ACTION | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -81,16 +82,22 @@ public class IncomingCallActivity extends CallActivity implements VoiceConnectio
 
         mTextTimer = (TextView) findViewById(R.id.text_timer);
 
-        TextView textName = (TextView) findViewById(R.id.text_name);
-        textName.setText(displayName);
-        TextView textNumber = (TextView) findViewById(R.id.text_phone_number);
-        textNumber.setText(handle);
+        mTextName = (TextView) findViewById(R.id.text_name);
+        mProductName = displayName;
+        mTextName.setText(displayName);
+        mTextPhoneNumber = (TextView) findViewById(R.id.text_phone_number);
+        mTextPhoneNumber.setText(handle);
 
         mBtnAnswer = (PanelLeft) findViewById(R.id.panel_left);
         mBtnIgnore = (PanelRight) findViewById(R.id.panel_right);
         mBtnEnd = findViewById(R.id.btn_cancel_calling);
         mBtnSpeak = (Button) findViewById(R.id.btn_speak);
         mBtnBluetooth = (Button) findViewById(R.id.btn_blue_tooth);
+        mBtnKeyPad = findViewById(R.id.btn_keypad);
+
+        mContainerCallInfo = findViewById(R.id.icon_area);
+        mKeyPadView = findViewById(R.id.keypad_view);
+        initKeyPadView(mKeyPadView);
 
         mContainerCallingBtn = findViewById(R.id.container_calling);
         mContainerWaitingBtn = findViewById(R.id.container_waiting);
@@ -151,6 +158,13 @@ public class IncomingCallActivity extends CallActivity implements VoiceConnectio
                 }
             }
         });
+
+        mBtnKeyPad.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeKeyPadButton();
+            }
+        });
     }
 
     private void switchCallingView(boolean hasToSwitch) {
@@ -159,6 +173,7 @@ public class IncomingCallActivity extends CallActivity implements VoiceConnectio
 
             mContainerCallingBtn.setVisibility(View.VISIBLE);
             mContainerWaitingBtn.setVisibility(View.GONE);
+            mContainerCallInfo.setVisibility(View.VISIBLE);
 
             mBtnEnd.setVisibility(View.VISIBLE);
 

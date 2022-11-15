@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:id="@+id/numberpad_row1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <Button
+            android:id="@+id/pin_code_button_1"
+            android:layout_width="@dimen/call_numpad_button_size"
+            android:layout_height="@dimen/call_numpad_button_size"
+            android:background="@drawable/round_button"
+            android:text="1"
+            android:textStyle="bold"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/numberpad_text_color"
+            android:layout_marginEnd="@dimen/base_margin"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintHorizontal_weight="1" />
+
+        <Button
+            android:id="@+id/pin_code_button_2"
+            android:layout_width="@dimen/call_numpad_button_size"
+            android:layout_height="@dimen/call_numpad_button_size"
+            android:background="@drawable/round_button"
+            android:text="2"
+            android:textStyle="bold"
+            android:layout_toRightOf="@id/pin_code_button_1"
+            android:layout_marginEnd="@dimen/base_margin"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/numberpad_text_color"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintHorizontal_weight="1" />
+
+        <Button
+            android:id="@+id/pin_code_button_3"
+            android:layout_width="@dimen/call_numpad_button_size"
+            android:layout_height="@dimen/call_numpad_button_size"
+            android:background="@drawable/round_button"
+            android:text="3"
+            android:textStyle="bold"
+            android:layout_toRightOf="@id/pin_code_button_2"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/numberpad_text_color"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintVertical_bias="0.0" />
+
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/numberpad_row2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/base_margin"
+        app:layout_constraintTop_toBottomOf="@+id/numberpad_row1"
+        app:layout_constraintStart_toStartOf="@+id/numberpad_row1">
+
+        <Button
+            android:id="@+id/pin_code_button_4"
+            android:layout_width="@dimen/call_numpad_button_size"
+            android:layout_height="@dimen/call_numpad_button_size"
+            android:background="@drawable/round_button"
+            android:text="4"
+            android:textStyle="bold"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/numberpad_text_color"
+            android:layout_marginEnd="@dimen/base_margin"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintHorizontal_weight="1"/>
+
+        <Button
+            android:id="@+id/pin_code_button_5"
+            android:layout_width="@dimen/call_numpad_button_size"
+            android:layout_height="@dimen/call_numpad_button_size"
+            android:background="@drawable/round_button"
+            android:text="5"
+            android:textStyle="bold"
+            android:layout_marginEnd="@dimen/base_margin"
+            android:layout_toRightOf="@id/pin_code_button_4"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/numberpad_text_color"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintHorizontal_weight="1" />
+
+        <Button
+            android:id="@+id/pin_code_button_6"
+            android:layout_width="@dimen/call_numpad_button_size"
+            android:layout_height="@dimen/call_numpad_button_size"
+            android:background="@drawable/round_button"
+            android:text="6"
+            android:textStyle="bold"
+            android:layout_toRightOf="@id/pin_code_button_5"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/numberpad_text_color"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
+
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/numberpad_row3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/base_margin"
+        app:layout_constraintTop_toBottomOf="@id/numberpad_row2"
+        app:layout_constraintStart_toStartOf="@id/numberpad_row2">
+
+        <Button
+            android:id="@+id/pin_code_button_7"
+            android:layout_width="@dimen/call_numpad_button_size"
+            android:layout_height="@dimen/call_numpad_button_size"
+            android:background="@drawable/round_button"
+            android:text="7"
+            android:textStyle="bold"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/numberpad_text_color"
+            android:layout_marginEnd="@dimen/base_margin"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintHorizontal_weight="1" />
+
+        <Button
+            android:id="@+id/pin_code_button_8"
+            android:layout_width="@dimen/call_numpad_button_size"
+            android:layout_height="@dimen/call_numpad_button_size"
+            android:background="@drawable/round_button"
+            android:text="8"
+            android:textStyle="bold"
+            android:layout_toRightOf="@id/pin_code_button_7"
+            android:layout_marginEnd="@dimen/base_margin"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/numberpad_text_color"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintHorizontal_weight="1" />
+
+        <Button
+            android:id="@+id/pin_code_button_9"
+            android:layout_width="@dimen/call_numpad_button_size"
+            android:layout_height="@dimen/call_numpad_button_size"
+            android:background="@drawable/round_button"
+            android:text="9"
+            android:textStyle="bold"
+            android:layout_toRightOf="@id/pin_code_button_8"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/numberpad_text_color"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
+
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/numberpad_row4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/base_margin"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/numberpad_row3"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@id/numberpad_row3">
+
+        <Button
+            android:id="@+id/pin_code_button_a"
+            android:layout_width="@dimen/call_numpad_button_size"
+            android:layout_height="@dimen/call_numpad_button_size"
+            android:background="@drawable/round_button"
+            android:text="*"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/numberpad_text_color"
+            android:layout_marginEnd="@dimen/base_margin"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintHorizontal_weight="1" />
+
+        <Button
+            android:id="@+id/pin_code_button_0"
+            android:layout_width="@dimen/call_numpad_button_size"
+            android:layout_height="@dimen/call_numpad_button_size"
+            android:background="@drawable/round_button"
+            android:text="0"
+            android:layout_marginEnd="@dimen/base_margin"
+            android:textStyle="bold"
+            android:layout_toRightOf="@id/pin_code_button_a"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/numberpad_text_color"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintHorizontal_weight="1" />
+
+        <Button
+            android:id="@+id/pin_code_button_p"
+            android:layout_width="@dimen/call_numpad_button_size"
+            android:layout_height="@dimen/call_numpad_button_size"
+            android:background="@drawable/round_button"
+            android:text="#"
+            android:textStyle="bold"
+            android:layout_toRightOf="@id/pin_code_button_0"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/numberpad_text_color"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            app:layout_constraintHorizontal_weight="1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
+
+    </RelativeLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

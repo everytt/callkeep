@@ -1,31 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:background="@drawable/bg_calling">
+
+    <TextView
+        android:id="@+id/call_card"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/base_margin_x5"
+        android:background="@drawable/bg_white_card"
+        android:gravity="center"
+        android:paddingVertical="@dimen/padding_rounded_card_vertical"
+        android:paddingHorizontal="@dimen/padding_rounded_card_horizontal"
+        android:text="@string/incoming_title_text"
+        android:textColor="@color/highlight"
+        android:textSize="@dimen/size_text_incoming_call_card"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:id="@+id/text_name"
+        android:layout_marginTop="@dimen/callscreen_card_bottom_margin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textColor="@color/highlight"
+        android:textSize="@dimen/size_text_name"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/call_card"/>
+
+    <include
+        android:id="@+id/keypad_view"
+        layout="@layout/keypad"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/base_margin_x2"
+        android:layout_marginBottom="@dimen/base_margin_x3"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/container_calling"/>
 
     <LinearLayout
+        android:id="@+id/icon_area"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/bg_calling"
-        android:gravity="center"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_name">
 
         <TextView
-            android:id="@+id/call_card"
-            android:layout_width="wrap_content"
+            android:id="@+id/text_waiting_big_msg"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/base_margin_x8"
-            android:background="@drawable/bg_white_card"
             android:gravity="center"
-            android:paddingBottom="@dimen/padding_rounded_card_vertical"
-            android:paddingLeft="@dimen/padding_rounded_card_horizontal"
-            android:paddingRight="@dimen/padding_rounded_card_horizontal"
-            android:paddingTop="@dimen/padding_rounded_card_vertical"
-            android:text="@string/incoming_title_text"
+            android:text="@string/outgoing_title_text"
             android:textColor="@color/highlight"
-            android:textSize="@dimen/size_text_incoming_call_card"
+            android:textSize="@dimen/size_title_message"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@+id/text_name"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/text_phone_number"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textColor="@color/sub_color"
+            android:text="01050316305"
+            app:layout_constraintTop_toBottomOf="@+id/text_waiting_big_msg"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:textSize="@dimen/size_text_handle" />
 
         <ImageView
             android:layout_width="130dp"
@@ -35,103 +95,106 @@
             android:src="@drawable/ic_ttgo_main_logo" />
 
         <TextView
-            android:id="@+id/text_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="23dp"
-            android:gravity="center"
-            android:textColor="@color/highlight"
-            android:textSize="@dimen/size_text_name"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/text_phone_number"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_text_top"
-            android:gravity="center"
-            android:textColor="@color/white"
-            android:textSize="@dimen/size_text_handle"/>
-
-        <TextView
             android:id="@+id/text_timer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="@dimen/base_margin_x5"
             android:background="@drawable/call_bg_time"
             android:gravity="center"
-            android:paddingBottom="@dimen/padding_rounded_card_vertical"
+            android:layout_marginTop="@dimen/margin_ttgo_big_icon"
             android:paddingLeft="@dimen/padding_rounded_card_horizontal"
-            android:paddingRight="@dimen/padding_rounded_card_horizontal"
             android:paddingTop="@dimen/padding_rounded_card_vertical"
+            android:paddingRight="@dimen/padding_rounded_card_horizontal"
+            android:paddingBottom="@dimen/padding_rounded_card_vertical"
+            android:text="00 : 00 : 00"
             android:textColor="@color/white"
             android:textSize="@dimen/size_text_timer"
             android:textStyle="bold"
-            android:visibility="gone" />
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="@dimen/base_margin_x3">
-
-            <RelativeLayout
-                android:id="@+id/container_waiting"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <io.wazo.callkeep.activity.PanelLeft
-                    android:id="@+id/panel_left"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true" />
-
-                <io.wazo.callkeep.activity.PanelRight
-                    android:id="@+id/panel_right"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true" />
-            </RelativeLayout>
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/container_calling"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/height_calling_area"
-                    android:orientation="horizontal"
-                    android:layout_gravity="bottom"
-                    android:layout_marginBottom="@dimen/base_margin_x6"
-                    android:elevation="@dimen/base_margin_x6"
-                    android:visibility="gone">
-                    <Button
-                        android:id="@+id/btn_speak"
-                        android:layout_width="@dimen/callscreen_sub_button_size"
-                        android:layout_height="@dimen/callscreen_sub_button_size"
-                        android:background="@drawable/call_btn_call_speaker_off"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintRight_toLeftOf="@id/btn_cancel_calling"/>
-                    <Button
-                        android:id="@+id/btn_cancel_calling"
-                        android:layout_width="@dimen/callscreen_main_button_size"
-                        android:layout_height="@dimen/callscreen_main_button_size"
-                        android:background="@drawable/btn_call_cancel"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintLeft_toRightOf="@id/btn_speak"
-                        app:layout_constraintRight_toLeftOf="@id/btn_blue_tooth"/>
-                    <Button
-                        android:id="@+id/btn_blue_tooth"
-                        android:layout_width="@dimen/callscreen_sub_button_size"
-                        android:layout_height="@dimen/callscreen_sub_button_size"
-                        android:background="@drawable/call_btn_bluetooth_off"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintLeft_toRightOf="@id/btn_cancel_calling"
-                        app:layout_constraintRight_toRightOf="parent"/>
-                </androidx.constraintlayout.widget.ConstraintLayout>
-        </FrameLayout>
-
+            android:visibility="visible" />
     </LinearLayout>
-</FrameLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/container_calling"
+        android:layout_width="match_parent"
+        android:layout_marginTop="@dimen/base_margin_x3"
+        android:layout_height="@dimen/height_calling_area"
+        android:orientation="horizontal"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="@dimen/base_margin_x4"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <Button
+            android:id="@+id/btn_speak"
+            android:layout_width="@dimen/callscreen_sub_button_size"
+            android:layout_height="@dimen/callscreen_sub_button_size"
+            android:background="@drawable/call_btn_call_speaker_off"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/btn_blue_tooth"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/btn_blue_tooth"
+            android:layout_width="@dimen/callscreen_sub_button_size"
+            android:layout_height="@dimen/callscreen_sub_button_size"
+            android:background="@drawable/call_btn_bluetooth_off"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/btn_speak"
+            app:layout_constraintRight_toLeftOf="@id/btn_cancel_calling"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/btn_cancel_calling"
+            android:layout_width="@dimen/callscreen_main_button_size"
+            android:layout_height="@dimen/callscreen_main_button_size"
+            android:background="@drawable/btn_call_cancel"
+            app:layout_constraintRight_toLeftOf="@id/btn_keypad"
+            app:layout_constraintLeft_toRightOf="@id/btn_blue_tooth"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/btn_keypad"
+            android:layout_width="@dimen/callscreen_sub_button_size"
+            android:layout_height="@dimen/callscreen_sub_button_size"
+            android:background="@drawable/call_btn_call_keypad_off"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/btn_cancel_calling"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <RelativeLayout
+        android:id="@+id/container_waiting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/size_avatar"
+        android:visibility="visible"
+        app:layout_constraintVertical_bias="0.6"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        >
+
+        <io.wazo.callkeep.activity.PanelLeft
+            android:id="@+id/panel_left"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true" />
+
+        <io.wazo.callkeep.activity.PanelRight
+            android:id="@+id/panel_right"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true" />
+
+    </RelativeLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
