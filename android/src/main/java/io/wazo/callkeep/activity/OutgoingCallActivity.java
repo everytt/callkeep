@@ -74,7 +74,7 @@ public class OutgoingCallActivity extends CallActivity implements VoiceConnectio
     private void init(String name, String handle) {
         if(name == null || name.isEmpty()) {
             name = handle;
-            handle = "10078";
+            handle = "";
         }
         mTextName = findViewById(R.id.text_name);
         mProductName = name;
