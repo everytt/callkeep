@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="size_title_message">25dp</dimen>
-    <dimen name="size_text_name">30dp</dimen>
+    <dimen name="size_title_message">20dp</dimen>
     <dimen name="size_content_message">18dp</dimen>
     <dimen name="size_text_handle">20dp</dimen>
 

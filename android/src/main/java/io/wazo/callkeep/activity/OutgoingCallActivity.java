@@ -179,7 +179,7 @@ public class OutgoingCallActivity extends CallActivity implements VoiceConnectio
             startTimer();
         } else {
             mContainerCallingBtn.setVisibility(View.VISIBLE);
-            mTextName.setVisibility(View.GONE);
+//            mTextName.setVisibility(View.GONE);
             mTextPhoneNumber.setVisibility(View.GONE);
             mTextTimer.setVisibility(View.GONE);
 
