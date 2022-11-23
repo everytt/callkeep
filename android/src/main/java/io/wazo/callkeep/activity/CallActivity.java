@@ -70,9 +70,9 @@ public class CallActivity extends Activity {
 
             long time = (now - mStartTime) / 1000;
 
-            long min = time / 60;
             long sec = time % 60;
-            long hour = min / 60;
+            long min = (time % 3600) / 60;
+            long hour = time / 3600;
 
             String strTime = String.format("%02d : %02d : %02d", hour, min, sec);
             if (mTextTimer != null) mTextTimer.setText(strTime);
