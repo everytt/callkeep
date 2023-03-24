@@ -97,6 +97,7 @@ public class CallKeepModule {
     }
 
     public void dispose(){
+        endAllCalls();
         if (voiceBroadcastReceiver == null || this._context == null) return;
         LocalBroadcastManager.getInstance(this._context).unregisterReceiver(voiceBroadcastReceiver);
         VoiceConnectionService.setPhoneAccountHandle(null);

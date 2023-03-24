@@ -237,14 +237,14 @@ static CXProvider* sharedProvider;
 
     NSDictionary *dic = payload.dictionaryPayload;
 
-    if (dic[@"aps"] != nil) {
-        NSLog(@"Do not use the 'alert' format for push type %@.", payload.type);
-        if(completion != nil) {
-            completion();
-        }
-        return;
+    // if (dic[@"aps"] != nil) {
+    //     NSLog(@"Do not use the 'alert' format for push type %@.", payload.type);
+    //     if(completion != nil) {
+    //         completion();
+    //     }
+    //     return;
         
-    }
+    // }
     
     NSString *command = dic[@"command"];
     

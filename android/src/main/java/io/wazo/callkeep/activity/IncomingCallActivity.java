@@ -45,7 +45,7 @@ public class IncomingCallActivity extends CallActivity implements VoiceConnectio
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Log.i(TAG, "onCreate ++");
+//        Log.i(TAG, "onCreate ++");
 
         Intent intent = getIntent();
         int callId = intent.getIntExtra(Constants.EXTRA_CALL_ID, 0);
@@ -106,7 +106,8 @@ public class IncomingCallActivity extends CallActivity implements VoiceConnectio
         applyBluetoothStatusUI();
 
         switchCallingView(accepted);
-        Log.i(TAG, "onCreate --");
+        startDestroyCaptureService(callId);
+//        Log.i(TAG, "onCreate --");
     }
 
     private void initListener() {
