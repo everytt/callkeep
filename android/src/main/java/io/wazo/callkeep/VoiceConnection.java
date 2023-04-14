@@ -24,7 +24,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.Icon;
 import android.media.AudioAttributes;
@@ -34,7 +33,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.MediaStore;
+import android.os.Looper;
 import android.telecom.CallAudioState;
 import android.telecom.Connection;
 import android.telecom.DisconnectCause;
@@ -43,7 +42,6 @@ import android.util.Log;
 import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -54,7 +52,6 @@ import static io.wazo.callkeep.Constants.*;
 
 import io.wazo.callkeep.activity.IncomingCallActivity;
 import io.wazo.callkeep.activity.OutgoingCallActivity;
-import io.wazo.callkeep.utils.ConstraintsMap;
 
 @TargetApi(Build.VERSION_CODES.M)
 public class VoiceConnection extends Connection {
@@ -142,7 +139,7 @@ public class VoiceConnection extends Connection {
     public void onShowIncomingCallUi() {
 //        super.onShowIncomingCallUi();
         Log.i(TAG, "onShowIncomingCallUi ++ " + mCallId);
-        createNotificationChanel();
+        createNotificationChannel();
         Intent intent = IncomingCallActivity.getIncomingCallIntent(context, mCallId, false, handle);
         PendingIntent pi;
         
@@ -219,7 +216,7 @@ public class VoiceConnection extends Connection {
         notificationManager.notify(CALL_NOTIFICATION, mCallId, notification);
     }
 
-    private void createNotificationChanel() {
+    private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channelCall = new NotificationChannel(
                     INCOMING_CHANNEL_ID,
@@ -365,10 +362,15 @@ public class VoiceConnection extends Connection {
 
         Log.d(TAG, "setConnectionDisconnected :: "+ c);
 
-        if(mIsIncomingCall && cause == DisconnectCause.REJECTED) cancelNotification();
+        if(mIsIncomingCall && cause == DisconnectCause.REJECTED) {
+            cancelNotification();
+            handle.put("rejected", "true");
+            sendCallRequestToActivity(ACTION_END_CALL_TO_END_POINT, handle);
+        } else {
+            sendCallRequestToActivity(ACTION_END_CALL, handle);
+        }
         setDisconnected(c);
 
-        sendCallRequestToActivity(ACTION_END_CALL, handle);
         ((VoiceConnectionService)context).deinitConnection(handle.get(EXTRA_CALL_UUID));
         destroy();
 
@@ -432,15 +434,21 @@ public class VoiceConnection extends Connection {
     @Override
     public void onReject() {
         super.onReject();
+        
+        cancelNotification();
         setDisconnected(new DisconnectCause(DisconnectCause.REJECTED));
-        sendCallRequestToActivity(ACTION_END_CALL, handle);
-        Log.d(TAG, "onReject executed");
+        sendCallRequestToActivity(ACTION_END_CALL_TO_END_POINT, handle);
         try {
             ((VoiceConnectionService) context).deinitConnection(handle.get(EXTRA_CALL_UUID));
         } catch(Throwable exception) {
             Log.e(TAG, "Handle map error", exception);
         }
         destroy();
+    }
+
+    public void onRejectToEndPoint() {
+        handle.put("rejected", "true");
+        onReject();
     }
 
     /*

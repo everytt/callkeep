@@ -51,7 +51,7 @@ public class IncomingNotificationReceiver extends BroadcastReceiver  {
                 break;
             case ACTION_REJECT_CALL:
                 if(connection != null) {
-                    connection.setConnectionDisconnected(DisconnectCause.REJECTED);
+                    connection.setConnectionDisconnected(DisconnectCause.LOCAL);
                     connection.destroy();
                 }
                 notificationManager.cancel(CALL_NOTIFICATION, callId);

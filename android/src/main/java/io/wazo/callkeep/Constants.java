@@ -7,6 +7,7 @@ public class Constants {
     public static final String ACTION_CHECK_REACHABILITY = "ACTION_CHECK_REACHABILITY";
     public static final String ACTION_DTMF_TONE = "ACTION_DTMF_TONE";
     public static final String ACTION_END_CALL = "ACTION_END_CALL";
+    public static final String ACTION_END_CALL_TO_END_POINT = "ACTION_END_CALL_TO_END_POINT";
     public static final String ACTION_HOLD_CALL = "ACTION_HOLD_CALL";
     public static final String ACTION_MUTE_CALL = "ACTION_MUTE_CALL";
     public static final String ACTION_ONGOING_CALL = "ACTION_ONGOING_CALL";
@@ -15,7 +16,7 @@ public class Constants {
     public static final String ACTION_WAKE_APP = "ACTION_WAKE_APP";
 
     public static final String INCOMING_CHANNEL_ID = "INCOMING_CALL_CHANNEL_ID";
-    public static final String INCOMING_CHANNEL_NAME = "INCOMING_CALL";
+    public static final String INCOMING_CHANNEL_NAME = "Incoming Call";
 
     public static final String EXTRA_CALL_ID = "EXTRA_CALL_ID";
     public static final String EXTRA_CALL_NUMBER = "EXTRA_CALL_NUMBER";

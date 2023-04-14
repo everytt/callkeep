@@ -25,8 +25,12 @@ class CallKeepPerformEndCallAction extends EventType {
 
 class CallKeepDidEndedCallToEndPointAction extends EventType {
   CallKeepDidEndedCallToEndPointAction();
+  CallKeepDidEndedCallToEndPointAction.fromMap(Map<dynamic, dynamic> arguemnts)
+      : reason = arguemnts['reason'] as String,
+        rejected = arguemnts['rejected'] as bool;
+
   String? reason;
-  CallKeepDidEndedCallToEndPointAction.fromMap(Map<dynamic, dynamic> arguemnts) : reason = arguemnts["reason"] as String;
+  bool rejected = false;
 }
 
 class CallKeepDidActivateAudioSession extends EventType {

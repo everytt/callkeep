@@ -271,7 +271,7 @@ static CXProvider* sharedProvider;
                                 payload:dic
                   withCompletionHandler:completion];
     } else if([@"C200" isEqualToString:command]) {
-        [self endCallToEndPoint: dic[@"reason"]];
+        [self endCallToEndPoint: dic[@"reason"] withCompletionHandler:completion];
     }
 }
 
@@ -356,18 +356,26 @@ contactIdentifier:(NSString * _Nullable)contactIdentifier
     }
 }
 
--(void) endCallToEndPoint: (NSString *) reason
+-(void) endCallToEndPoint: (NSString *) reason withCompletionHandler:(nonnull void (^)(void))completion
 {
     NSLog(@"[CallKeep][endCallToEndPoint]");
 
+    bool rejected = NO;
     for (CXCall *call in self.callKeepCallController.callObserver.calls) {
         NSLog(@"[CallKeep][endCallToEndPoint] + ended : %@", call.UUID);
-
-        [sharedProvider reportCallWithUUID:call.UUID endedAtDate:[NSDate date] reason:CXCallEndedReasonRemoteEnded];
+        if(call.outgoing == NO && call.hasConnected == NO) {
+            rejected = YES;
+            NSLog(@"[CallKeep][endCallToEndPoint] + i am incoming reject : %@", call.UUID);
+            [sharedProvider reportCallWithUUID:call.UUID endedAtDate:[NSDate date] reason:CXCallEndedReasonUnanswered];
+        } else {
+            [sharedProvider reportCallWithUUID:call.UUID endedAtDate:[NSDate date] reason:CXCallEndedReasonRemoteEnded];
+        }
     }
-    [self sendEventWithNameWrapper:CallKeepDidEndedCallToEndPointAction body: @{@"reason": reason}];
+    [self sendEventWithNameWrapper:CallKeepDidEndedCallToEndPointAction body: @{@"reason": reason, @"rejected": @(rejected)}];
     
-
+    if (completion != nil) {
+            completion();
+    }
 }
 
 -(void) setOnHold:(NSString *)uuidString shouldHold:(BOOL)shouldHold
@@ -822,7 +830,7 @@ continueUserActivity:(NSUserActivity *)userActivity
 #ifdef DEBUG
     NSLog(@"[CallKeep][CXProviderDelegate][provider:performEndCallAction]");
 #endif
-    [self sendEventWithNameWrapper:CallKeepPerformEndCallAction body:@{ @"callUUID": [action.callUUID.UUIDString lowercaseString] }];
+    [self sendEventWithNameWrapper:CallKeepPerformEndCallAction body:@{ @"callUUID": [action.callUUID.UUIDString lowercaseString], @"rejected": @NO }];
     [action fulfill];
 }
 

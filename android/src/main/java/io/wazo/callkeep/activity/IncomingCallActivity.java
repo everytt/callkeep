@@ -131,7 +131,7 @@ public class IncomingCallActivity extends CallActivity implements VoiceConnectio
             @Override
             public void onPanelEnd() {
                 if(mConnection != null) {
-                    mConnection.setConnectionDisconnected(DisconnectCause.REJECTED);
+                    mConnection.setConnectionDisconnected(DisconnectCause.LOCAL);
                     mConnection.destroy();
                 }
 //                finish();

@@ -79,14 +79,14 @@ public class VoiceConnectionService extends ConnectionService {
 
     public static final String ONGOING_CHANNEL_ID = "io.winehouse.ttgo.call";
 
-    public static Connection getConnection(String connectionId) {
+    public static VoiceConnection getConnection(String connectionId) {
         if (currentConnections.containsKey(connectionId)) {
             return currentConnections.get(connectionId);
         }
         return null;
     }
 
-    public static Connection getConnectionById(int callId) {
+    public static VoiceConnection getConnectionById(int callId) {
         for(VoiceConnection connection : currentConnections.values()) {
             if (connection.getCallId() == callId) {
                 return connection;

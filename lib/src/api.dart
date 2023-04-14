@@ -121,7 +121,7 @@ class FlutterCallkeep extends EventManager {
    * Android explicitly states we reject a call
    * On iOS we just notify of an endCall
    */
-  Future<void> rejectCall(String uuid) async {
+  Future<void> rejectCall(String uuid, bool byEndpoint) async {
     if (!isIOS) {
       await _channel.invokeMethod<void>('rejectCall', <String, dynamic>{'uuid': uuid});
     } else {

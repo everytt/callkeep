@@ -442,12 +442,12 @@ public class CallKeepModule {
             return;
         }
 
-        Connection conn = VoiceConnectionService.getConnection(uuid);
+        VoiceConnection conn = VoiceConnectionService.getConnection(uuid);
         if (conn == null) {
             return;
         }
 
-        conn.onReject();
+        conn.onRejectToEndPoint();
     }
 
     
@@ -653,6 +653,7 @@ public class CallKeepModule {
         if (!isReceiverRegistered) {
             IntentFilter intentFilter = new IntentFilter();
             intentFilter.addAction(ACTION_END_CALL);
+            intentFilter.addAction(ACTION_END_CALL_TO_END_POINT);
             intentFilter.addAction(ACTION_ANSWER_CALL);
             intentFilter.addAction(ACTION_MUTE_CALL);
             intentFilter.addAction(ACTION_UNMUTE_CALL);
@@ -776,6 +777,10 @@ public class CallKeepModule {
                         CallKeepBackgroundMessagingService.acquireWakeLockNow(_context);
                     }
                     break;
+                case ACTION_END_CALL_TO_END_POINT:
+                    args.putString("callUUID", attributeMap.get(EXTRA_CALL_UUID));
+                    args.putBoolean("rejected", Boolean.parseBoolean(attributeMap.get("rejected")));
+                    sendEventToFlutter("CallKeepDidEndedCallToEndPointAction", args);
             }
         }
     }
