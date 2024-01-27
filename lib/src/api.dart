@@ -343,6 +343,9 @@ class FlutterCallkeep extends EventManager {
         emit(CallKeepPerformEndCallAction.fromMap(data));
         break;
       case 'CallKeepDidEndedCallToEndPointAction':
+        //jinaki 2024.01.27
+        data['reason'] = data['reason'] ?? '';
+        data['rejected'] = data['rejected'] ?? false;
         emit(CallKeepDidEndedCallToEndPointAction.fromMap(data));
         break;
       case 'CallKeepDidActivateAudioSession':
