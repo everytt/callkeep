@@ -22,7 +22,7 @@ rootProject.allprojects {
 apply plugin: 'com.android.library'
 
 android {
-    namespace "com.github.cloudwebrtc.flutter_callkeep"
+    namespace "io.wazo.callkeep"
     compileSdkVersion 32
 
     defaultConfig {
