@@ -12,7 +12,7 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
-import io.flutter.plugin.common.PluginRegistry.Registrar;
+// import io.flutter.plugin.common.PluginRegistry.Registrar;
 import io.wazo.callkeep.CallKeepModule;
 
 /** FlutterCallkeepPlugin */
@@ -27,20 +27,20 @@ public class FlutterCallkeepPlugin implements FlutterPlugin, MethodCallHandler, 
   /**
    * Plugin registration.
    */
-  public static void registerWith(Registrar registrar) {
-    final FlutterCallkeepPlugin plugin = new FlutterCallkeepPlugin();
+  // public static void registerWith(Registrar registrar) {
+  //   final FlutterCallkeepPlugin plugin = new FlutterCallkeepPlugin();
 
-    plugin.startListening(registrar.context(), registrar.messenger());
+  //   plugin.startListening(registrar.context(), registrar.messenger());
 
-    if (registrar.activeContext() instanceof Activity) {
-      plugin.setActivity((Activity) registrar.activeContext());
-    }
+  //   if (registrar.activeContext() instanceof Activity) {
+  //     plugin.setActivity((Activity) registrar.activeContext());
+  //   }
 
-    registrar.addViewDestroyListener(view -> {
-      plugin.stopListening();
-      return false;
-    });
-  }
+  //   registrar.addViewDestroyListener(view -> {
+  //     plugin.stopListening();
+  //     return false;
+  //   });
+  // }
 
   private void setActivity(@NonNull Activity activity) {
     callKeep.setActivity(activity);
